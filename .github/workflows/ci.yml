@@ -1,0 +1,45 @@
+name: MiniFarm CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Make Maven Wrapper Executable
+        run: chmod +x ./mvnw
+
+      - name: Compile and Verify All Units
+        run: ./mvnw -B test-compile
+
+      - name: Run Unit Tests (Dynamic PR Unit Detection)
+        run: |
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Current branch: $BRANCH_NAME"
+          
+          # Cek apakah branch memiliki format unit/UXX/...
+          if [[ "$BRANCH_NAME" =~ unit/(u|U)([0-9]{2}) ]]; then
+            UNIT_ID="U${BASH_REMATCH[2]}"
+            echo "Detected PR for Unit: $UNIT_ID"
+            echo "Running test suite specifically for $UNIT_ID..."
+            ./mvnw -B test -Dgroups="$UNIT_ID"
+          else
+            echo "Running all tests or reference tests..."
+            ./mvnw -B test
+          fi
+
