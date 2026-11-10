@@ -33,3 +33,14 @@ package minifarm.units.u18housing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class Pasture extends AbstractAnimalHousing {
+    public Pasture() {
+        super("pasture", "Sheep Pasture", 6);
+    }
+
+    @Override 
+    public boolean supportsSpecies(String species) {
+        return "sheep".equalsIgnoreCase(species);
+    }
+}

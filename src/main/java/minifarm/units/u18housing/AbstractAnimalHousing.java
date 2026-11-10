@@ -96,3 +96,63 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractAnimalHousing {
+    private final String housingId;
+    private final String name;
+    private int capacity;
+    private final List<String> animalIds = new ArrayList<>();
+
+    protected AbstractAnimalHousing(String housingId, String name, int initialCapacity) {
+        if (initialCapacity <= 0) {
+            throw new IllegalArgumentException("Kapasitas harus positif");
+        }
+        this.housingId = housingId;
+        this.name = name;
+        this.capacity = initialCapacity;
+    }
+
+    public String getHousingId() {
+        return housingId;
+    }
+    public String getName() {
+        return name;
+    }
+    public int getCapacity() {
+        return capacity;
+    }
+    public int getOccupiedCount() {
+        return animalIds.size();
+    }
+    public List<String> getAnimalIds() {
+        return Collections.unmodifiableList(animalIds);
+    }
+    public void expandCapacity(int extra) {
+        if (extra > 0) {
+            this.capacity += extra;
+        }
+    }
+
+    public OperationResult<Void> addAnimal(String animalId, String species) {
+        if (!supportsSpecies(species)) {
+            return OperationResult.failed(ResultCode.NOT_ALLOWED, name + " tidak dapat menampung spesies: " + species);
+        }
+        if (animalIds.size() >= capacity) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, name + " sudah penuh (Kapasitas: " + capacity + ")");
+        }
+        if (animalIds.contains(animalId)) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, "Hewan sudah berada di kandang ini");
+        }
+        animalIds.add(animalId);
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> removeAnimal(String animalId) {
+        if (!animalIds.remove(animalId)) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Hewan tidak ada di kandang ini: " + animalId);
+        }
+        return OperationResult.ok();
+    }
+
+    public abstract boolean supportsSpecies(String species);
+}

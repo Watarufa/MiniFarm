@@ -33,3 +33,14 @@ package minifarm.units.u18housing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class Barn extends AbstractAnimalHousing {
+    public Barn() {
+        super("barn", "Cattle Barn", 4);
+    }
+
+    @Override 
+    public boolean supportsSpecies(String species) {
+        return "cow".equalsIgnoreCase(species);
+    }
+}

@@ -106,3 +106,73 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class HousingService implements HousingPort, HousingCapacityPort {
+    private final Map<String, AbstractAnimalHousing> housings = new LinkedHashMap<>();
+
+    public HousingService() {
+        Coop coop = new Coop();
+
+        coop.addAnimal("chicken_1", "chicken");
+        coop.addAnimal("chicken_2", "chicken");
+        housings.put(coop.getHousingId(), coop);
+
+        Barn barn = new Barn();
+        housings.put(barn.getHousingId(), barn);
+    }
+
+    public void registerHousing(AbstractAnimalHousing housing) {
+        if (housing != null) {
+            housings.put(housing.getHousingId(), housing);
+        }
+    }
+    public AbstractAnimalHousing getHousingEntity(String housingId) {
+        if (housingId == null) return null;
+        return housings.get(housingId.toLowerCase());
+    }
+    @Override 
+    public int getCapacity(String housingId) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        return h != null ? h.getCapacity() : 0;
+    }
+    @Override 
+    public int getOccupiedCount(String housingId) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        return h != null ? h.getOccupiedCount() : 0;
+    }
+    @Override 
+    public boolean canAcceptSpecies(String housingId, String species) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        return h != null && h.supportsSpecies(species);
+    }
+    @Override 
+    public OperationResult<Void> placeAnimal(String housingId, String animalId) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        if (h == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Kandang tidak ditemukan: " + housingId);
+        }
+        return h.addAnimal(animalId, "chicken");
+    }
+    @Override
+    public OperationResult<Void> removeAnimal(String housingId, String animalId) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        if (h == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Kandang tidak ditemukan: " + housingId);
+        }
+        return h.removeAnimal(animalId);
+    }
+    @Override
+    public List<String> getAnimalIdsInHousing(String housingId) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        return h != null ? h.getAnimalIds() : Collections.emptyList();
+    }
+    @Override
+    public OperationResult<Void> expandCapacity(String housingId, int additionalCapacity) {
+        AbstractAnimalHousing h = getHousingEntity(housingId);
+        if (h == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Kandang tidak ditemukan");
+        }
+        h.expandCapacity(additionalCapacity);
+        return OperationResult.ok();
+    }
+}
