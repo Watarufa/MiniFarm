@@ -35,3 +35,14 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class Coop extends AbstractAnimalHousing {
+    public Coop() {
+        super("coop", "Chicken Coop", GameConfig.INITIAL_COOP_CAPACITY);
+    }
+
+    @Override 
+    public boolean supportsSpecies(String species) {
+        return "chicken".equalsIgnoreCase(species);
+    }
+}
