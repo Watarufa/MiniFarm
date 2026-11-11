@@ -101,3 +101,54 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class DeliveryOrderService {
+    private final Map<String, AbstractDeliveryOrder> orders = new LinkedHashMap<>();
+    private final EventBus eventBus;
+
+    public DeliveryOrderService(EventBus, eventBus) {
+        this.eventBus = eventBus;
+        registerOrder(new CropDeliveryOrder());
+        registerOrder(new AnimalProductDeliveryOrder());
+        registerOrder(new MixedProduceOrder());
+    }
+
+    public DeliveryOrderService() {
+        this(null);
+    }
+
+    public void registerOrder(AbstractDeliveryOrder order) {
+        if (order != null) {
+            orders.put(order.getOrderId(), order);
+        }
+    }
+
+    public List<AbstractDeliveryOrder> getAllOrders() {
+        return Collections.unmodifiableList(new ArrayList<>(orders.values()));
+    }
+
+    public Optional<AbstractDeliveryOrder> getOrder(String orderId) {
+        if (orderId == null) return Optional.empty();
+        return Optional.ofNullable(orders.get(orderId));
+    }
+
+    public OperationResult<Void> fulfillOrder(String orderId, int day, InventoryPort inventoryPort, WalletPort walletPort) {
+        if (valRes.isFailure()) {
+            return OperationResult.failed(valRes.getCode(), valRes.getMessage());
+        }
+
+        for (ItemStack req : order.getRequiredItems()) {
+            inventoryPort.removeItem(req.getItemId(), req.getQuantity());
+        }
+
+        walletPort.credit(order.getRewardCoins(), "Reward Order: " + order.getCustomerName());
+        order.setCompleted(true);
+
+        if (eventBus != null) {
+            eventBus.publish(new OrderCompleted(day, order.getOrderId(), order.getRewardCoins()));
+        }
+
+        return OperationResult.ok();
+    }
+}
