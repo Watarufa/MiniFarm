@@ -84,3 +84,62 @@ import java.util.List;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractDeliveryOrder {
+    private final String orderId;
+    private final String customerName;
+    private final long rewardCoins;
+    private final List<ItemStack> requiredItems;
+    private boolean completed;
+
+    protected AbstractDeliveryOrder(String orderId, String customerName, long rewardCoins, List<ItemStack> requiredItems) {
+        this.orderId = orderId;
+        this.customerName = customerName;
+        this.rewardCoins = rewardCoins;
+        this.requiredItems = requiredItems != null ? requiredItems : List.of();
+        this.completed = false;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public String getCustomerName() {
+
+        return customerName;
+    }
+
+    public long getRewardCoins() {
+        return rewardCoins;
+    }
+
+    public List<ItemStack> getRequiredItems() {
+
+        return Collections.unmodifiableList(requiredItems);
+    }
+
+    public boolean isCompleted() {
+        
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+
+        this.completed = completed;
+    }
+
+    public OperationResult<Void> validateAvailability(InventoryPort inventoryPort) {
+        if (completed) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, "Pesanan sudah pernah dipenuhi");
+        }
+
+        for (ItemStack req : requiredItems) {
+            if  (!inventoryPort.hasItem(req.getItemId(), req.getQuantity())) {
+                return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Item kurang: butuh " + req.getQuantity() + "x " + req.getItemId());
+            }
+        }
+        
+        return OperationResult.ok();
+    }
+
+ }
