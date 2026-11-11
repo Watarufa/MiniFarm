@@ -45,3 +45,18 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public abstract class AbstractFarmStatistic {
+    private final String metricName;
+
+    protected AbstractFarmStatistic(String metricName) {
+        this.metricName = metricName;
+    }
+
+    public String getMetricName() {
+        return metricName;
+    }
+
+    public abstract void onEvent(DomainEvent event);
+
+    public abstract String getFormattedSummary();
+}
