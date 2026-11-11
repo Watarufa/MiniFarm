@@ -38,3 +38,15 @@ import java.util.List;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class MixedProduceOrder extends AbstractDeliveryOrder {
+    
+    public MixedProduceOrder() {
+        super(
+            "order_mixed_1", "Pasar Akhir Pekan", 70L, List.of(
+                new ItemStack(GameConfig.CROP_WHEAT, 2), 
+                new ItemStack(GameConfig.ITEM_EGG, 2)
+            )
+        );
+    }
+}

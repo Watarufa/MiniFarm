@@ -107,7 +107,7 @@ public class DeliveryOrderService {
     private final Map<String, AbstractDeliveryOrder> orders = new LinkedHashMap<>();
     private final EventBus eventBus;
 
-    public DeliveryOrderService(EventBus, eventBus) {
+    public DeliveryOrderService(EventBus eventBus) {
         this.eventBus = eventBus;
         registerOrder(new CropDeliveryOrder());
         registerOrder(new AnimalProductDeliveryOrder());
@@ -134,6 +134,14 @@ public class DeliveryOrderService {
     }
 
     public OperationResult<Void> fulfillOrder(String orderId, int day, InventoryPort inventoryPort, WalletPort walletPort) {
+        Optional<AbstractDeliveryOrder> orderOpt = getOrder(orderId);
+        if (orderOpt.isEmpty()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Pesanan tidak ditemukan: " + orderId);
+        }
+        AbstractDeliveryOrder order = orderOpt.get();
+
+        OperationResult<Void> valRes = order.validateAvailability(inventoryPort);
+        
         if (valRes.isFailure()) {
             return OperationResult.failed(valRes.getCode(), valRes.getMessage());
         }
