@@ -3,61 +3,50 @@ package minifarm.units.u13farmerprofile;
 import minifarm.core.api.FarmerProfilePort;
 import minifarm.core.api.FarmerSnapshot;
 
-/*
- * ================================================================================================
- * PETUNJUK SPESIFIKASI KELAS (KOSONGAN - KETIK SENDIRI DARI NOL): FarmerProfileService
- * ================================================================================================
- * Modul Unit: U13FARMERPROFILE
- * 
- * Deskripsi Kelas:
- * Public Facade untuk Unit U13: Profil dan Spesialisasi Petani.
- * Mengimplementasikan FarmerProfilePort.
- * 
- * ------------------------------------------------------------------------------------------------
- * 1. DEKLARASI KELAS / INTERFACE:
- * ------------------------------------------------------------------------------------------------
- * - Deklarasikan: public class FarmerProfileService
- * - Interface yang Diimplementasikan: implements FarmerProfilePort
- * 
- * ------------------------------------------------------------------------------------------------
- * 2. ATRIBUT / FIELDS YANG HARUS DIDEKLARASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. private AbstractFarmerProfile currentProfile;
- * 
- * ------------------------------------------------------------------------------------------------
- * 3. CONSTRUCTOR YANG HARUS DIBUAT:
- * ------------------------------------------------------------------------------------------------
- * 1. Constructor: public FarmerProfileService(AbstractFarmerProfile initialProfile)
- *    Logika Implementasi:
- *      this.currentProfile = initialProfile != null ? initialProfile : new BalancedFarmer("Player");
- * 
- * 2. Constructor: public FarmerProfileService()
- *    Logika Implementasi:
- *      this(new BalancedFarmer("Player"));
- * 
- * ------------------------------------------------------------------------------------------------
- * 4. METHOD-METHOD YANG HARUS DIIMPLEMENTASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. public void setProfile(AbstractFarmerProfile profile)
- *    Logika Implementasi:
- *      if (profile != null) {
- *          this.currentProfile = profile;
- *      }
- * 
- * 2. public AbstractFarmerProfile getProfileEntity()
- *    Logika Implementasi:
- *      return currentProfile;
- * 
- * 3. @Override public FarmerSnapshot getProfile()
- *    Logika Implementasi:
- *      return currentProfile.toSnapshot(100, 100, 500L);
- * 
- * 4. @Override public double getEnergyModifier(String actionType)
- *    Logika Implementasi:
- *      // TODO U13: Panggil modifier polimorfik dari currentProfile
- *      return currentProfile.getEnergyCostModifier(actionType);
- * 
- * ================================================================================================
- * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
- * ================================================================================================
- */
+// pintu masuk (facade) unit U13 buat modul lain
+// implements FarmerProfilePort: interface ini kontraknya, jadi method di dalamnya wajib dibikin
+public class FarmerProfileService implements FarmerProfilePort {
+
+    // tipenya induk (abstract class), jadi isinya bisa Balanced, Cultivator, atau Rancher
+    private AbstractFarmerProfile currentProfile;
+
+    public FarmerProfileService(AbstractFarmerProfile initialProfile) {
+        // kalau profil awal null, pakai petani default biar service tetap siap dipakai
+        if (initialProfile != null) {
+            this.currentProfile = initialProfile;
+        } else {
+            this.currentProfile = new BalancedFarmer("Player");
+        }
+    }
+
+    public FarmerProfileService() {
+        // constructor tanpa parameter, langsung pakai petani default
+        this(new BalancedFarmer("Player"));
+    }
+
+    public void setProfile(AbstractFarmerProfile profile) {
+        // ganti profesi cuma kalau profil barunya gak null
+        if (profile != null) {
+            this.currentProfile = profile;
+        }
+    }
+
+    public AbstractFarmerProfile getProfileEntity() {
+        return currentProfile;
+    }
+
+    // method dari interface FarmerProfilePort
+    @Override
+    public FarmerSnapshot getProfile() {
+        // nilai awalnya: energi 100 dari 100, koin 500
+        return currentProfile.toSnapshot(100, 100, 500L);
+    }
+
+    // method dari interface FarmerProfilePort
+    @Override
+    public double getEnergyModifier(String actionType) {
+        // polymorphism: yang jalan itu versi milik profesi yang lagi aktif
+        // service gak perlu tau profesinya apa, tinggal panggil aja
+        return currentProfile.getEnergyCostModifier(actionType);
+    }
+}
