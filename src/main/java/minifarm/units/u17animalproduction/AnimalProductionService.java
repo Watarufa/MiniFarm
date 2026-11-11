@@ -1,127 +1,138 @@
 package minifarm.units.u17animalproduction;
 
-import minifarm.core.api.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+
+import minifarm.core.api.AnimalSnapshot;
+import minifarm.core.api.DailyTickParticipant;
+import minifarm.core.api.DayContext;
+import minifarm.core.api.FarmAnimalPort;
+import minifarm.core.api.InventoryPort;
+import minifarm.core.api.ItemStack;
+import minifarm.core.api.OperationResult;
+import minifarm.core.api.ResultCode;
 import minifarm.core.events.AnimalProductCollected;
 import minifarm.core.events.EventBus;
-import java.util.*;
 
-/*
- * ================================================================================================
- * PETUNJUK SPESIFIKASI KELAS (KOSONGAN - KETIK SENDIRI DARI NOL): AnimalProductionService
- * ================================================================================================
- * Modul Unit: U17ANIMALPRODUCTION
- * 
- * Deskripsi Kelas:
- * Public Facade untuk Unit U17: Produksi dan Pengumpulan Produk Hewan.
- * Mengimplementasikan DailyTickParticipant.
- * 
- * ------------------------------------------------------------------------------------------------
- * 1. DEKLARASI KELAS / INTERFACE:
- * ------------------------------------------------------------------------------------------------
- * - Deklarasikan: public class AnimalProductionService
- * - Interface yang Diimplementasikan: implements DailyTickParticipant
- * 
- * ------------------------------------------------------------------------------------------------
- * 2. ATRIBUT / FIELDS YANG HARUS DIDEKLARASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. private final Map<String, AbstractAnimalProductionRule> rules = new HashMap<>();
- * 2. private final List<ItemStack> pendingOutputs = new ArrayList<>();
- * 3. private final EventBus eventBus;
- * 
- * ------------------------------------------------------------------------------------------------
- * 3. CONSTRUCTOR YANG HARUS DIBUAT:
- * ------------------------------------------------------------------------------------------------
- * 1. Constructor: public AnimalProductionService(EventBus eventBus)
- *    Logika Implementasi:
- *      this.eventBus = eventBus;
- *      registerRule(new EggProductionRule());
- *      registerRule(new MilkProductionRule());
- *      registerRule(new WoolProductionRule());
- * 
- * 2. Constructor: public AnimalProductionService()
- *    Logika Implementasi:
- *      this(null);
- * 
- * ------------------------------------------------------------------------------------------------
- * 4. METHOD-METHOD YANG HARUS DIIMPLEMENTASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. public void registerRule(AbstractAnimalProductionRule rule)
- *    Logika Implementasi:
- *      if (rule != null) {
- *          rules.put(rule.getSpecies(), rule);
- *      }
- * 
- * 2. @Override public String getParticipantName()
- *    Logika Implementasi:
- *      return "AnimalProductionService";
- * 
- * 3. @Override public int getExecutionOrder()
- *    Logika Implementasi:
- *      return 40;
- * 
- * 4. @Override public void onDayAdvance(DayContext context)
- *    Logika Implementasi:
- *      // Pemrosesan otomatis via Advance Day dipicu melalui triggerProduction
- * 
- * 5. public void processDailyProduction(int day, FarmAnimalPort animalPort, InventoryPort inventoryPort)
- *    Keterangan / Tujuan: Memproses produksi untuk semua hewan terdaftar. Jika inventaris penuh, produk disimpan di pendingOutputs agar tidak hilang diam-diam!
- *    Logika Implementasi:
- *      // TODO U17:
- *      // 1. Ambil seluruh hewan dari animalPort.getAllAnimals().
- *      // 2. Untuk setiap hewan, cari rule yang cocok berdasarkan species.
- *      // 3. Jika rule menghasilkan produk:
- *      //    - Coba masukkan ke inventoryPort.
- *      //    - Jika inventory penuh, masukkan ke pendingOutputs.
- *      //    - Publikasikan event AnimalProductCollected jika masuk ke inventory.
- *      if (animalPort == null) return;
- *      
- *      for (AnimalSnapshot animal : animalPort.getAllAnimals()) {
- *          AbstractAnimalProductionRule rule = rules.get(animal.getSpecies().toLowerCase());
- *          if (rule != null) {
- *              Optional<ItemStack> productOpt = rule.calculateDailyProduction(animal);
- *              if (productOpt.isPresent()) {
- *                  ItemStack product = productOpt.get();
- *                  if (inventoryPort != null && inventoryPort.hasItem(product.getItemId(), 1)) {
- *                      inventoryPort.addItem(product.getItemId(), product.getQuantity());
- *                      if (eventBus != null) {
- *                          eventBus.publish(new AnimalProductCollected(day, animal.getId(), product.getItemId(), product.getQuantity()));
- *                      }
- *                  } else if (inventoryPort != null && inventoryPort.getAvailableSlots() > 0) {
- *                      inventoryPort.addItem(product.getItemId(), product.getQuantity());
- *                      if (eventBus != null) {
- *                          eventBus.publish(new AnimalProductCollected(day, animal.getId(), product.getItemId(), product.getQuantity()));
- *                      }
- *                  } else {
- *                      // Inventaris penuh: simpan ke pending output
- *                      pendingOutputs.add(product);
- *                  }
- *              }
- *          }
- *      }
- * 
- * 6. public List<ItemStack> getPendingOutputs()
- *    Logika Implementasi:
- *      return Collections.unmodifiableList(pendingOutputs);
- * 
- * 7. public OperationResult<Void> claimPendingOutputs(InventoryPort inventoryPort, int day)
- *    Logika Implementasi:
- *      if (pendingOutputs.isEmpty()) {
- *          return OperationResult.ok();
- *      }
- *      Iterator<ItemStack> it = pendingOutputs.iterator();
- *      while (it.hasNext()) {
- *          ItemStack stack = it.next();
- *          if (inventoryPort.getAvailableSlots() > 0 || inventoryPort.hasItem(stack.getItemId(), 1)) {
- *              inventoryPort.addItem(stack.getItemId(), stack.getQuantity());
- *              it.remove();
- *              if (eventBus != null) {
- *                  eventBus.publish(new AnimalProductCollected(day, "pending", stack.getItemId(), stack.getQuantity()));
- *              }
- *          }
- *      }
- *      return OperationResult.ok();
- * 
- * ================================================================================================
- * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
- * ================================================================================================
- */
+// pintu masuk / facade unit U17 buat produksi dan mengumpulkan produk hewan
+// implements DailyTickParticipant: service ikut masuk alur pergantian hari
+public class AnimalProductionService implements DailyTickParticipant {
+
+    // map ini nyimpan aturan berdasarkan jenis hewan
+    private final Map<String, AbstractAnimalProductionRule> rules = new HashMap<>();
+    // produk yg belum muat di inventaris disimpen di sini biar ga hilang
+    private final List<ItemStack> pendingOutputs = new ArrayList<>();
+    private final EventBus eventBus;
+
+    public AnimalProductionService(EventBus eventBus) {
+        this.eventBus = eventBus;
+        // mendaftarkan aturan bawaan untuk ayam, sapi dan domba
+        registerRule(new EggProductionRule());
+        registerRule(new MilkProductionRule());
+        registerRule(new WoolProductionRule());
+    }
+
+    public AnimalProductionService() {
+        // constructor tanpa event bus tetep bisa dipake
+        this(null);
+    }
+
+    public void registerRule(AbstractAnimalProductionRule rule) {
+        // abaikan null supaya isi map tetap valid
+        if (rule != null) {
+            rules.put(rule.getSpecies(), rule);
+        }
+    }
+
+    // nama yg dipake scheduler buat ngenalin participant 
+    @Override
+    public String getParticipantName() {
+        return "AnimalProductionService";
+    }
+
+    // urutan 40 mengikuti urutan pemrosesan yg ditentukan unit ini
+    @Override
+    public int getExecutionOrder() {
+        return 40;
+    }
+
+    // produksi diproses lewat triggerProduction karena port hewan dan inventaris ada di sana
+    @Override
+    public void onDayAdvance(DayContext context) {
+        // belum ada aksi langsung di sini; pemanggil mengirim port lewat processDailyProduction
+    }
+
+    public void processDailyProduction(int day, FarmAnimalPort animalPort, InventoryPort inventoryPort) {
+        // tanpa port hewan ga ada daftar ternak yg bisa diproses
+        if (animalPort == null) {
+            return;
+        }
+
+        List<AnimalSnapshot> animals = animalPort.getAllAnimals();
+        if (animals == null) {
+            return;
+        }
+
+        for (AnimalSnapshot animal : animals) {
+            // lewati data kosong / tanpa spesies
+            if (animal == null || animal.getSpecies() == null) {
+                continue;
+            }
+
+            AbstractAnimalProductionRule rule = rules.get(animal.getSpecies().trim().toLowerCase(Locale.ROOT));
+            if (rule == null) {
+                continue; // belum ada aturan untuk jenis hewan ini
+            }
+
+            Optional<ItemStack> productOpt = rule.calculateDailyProduction(animal);
+            if (!productOpt.isPresent()) {
+                continue; // hewan belum memenuhi syarat produksi
+            }
+
+            ItemStack product = productOpt.get();
+            // kalau inventaris bisa menerima produk, simpan dan kabari lewat event
+            if (inventoryPort != null && inventoryPort.addItem(product.getItemId(), product.getQuantity()).isSuccess()) {
+                publishCollectedEvent(day, animal.getId(), product);
+            } else {
+                // inventaris penuh / gagal menerima item, simpan buat diklaim nanti
+                pendingOutputs.add(product);
+            }
+        }
+    }
+
+    public List<ItemStack> getPendingOutputs() {
+        // caller boleh baca listnya, tapi ga bisa mengubah list internal service
+        return Collections.unmodifiableList(pendingOutputs);
+    }
+
+    public OperationResult<Void> claimPendingOutputs(InventoryPort inventoryPort, int day) {
+        if (inventoryPort == null) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Inventory tidak boleh null");
+        }
+
+        Iterator<ItemStack> it = pendingOutputs.iterator();
+        while (it.hasNext()) {
+            ItemStack stack = it.next();
+            // hapus dari pending dan kirim event cuma klo inventaris berhasil nerima
+            if (inventoryPort.addItem(stack.getItemId(), stack.getQuantity()).isSuccess()) {
+                it.remove();
+                publishCollectedEvent(day, "pending", stack);
+            }
+        }
+        return OperationResult.ok();
+    }
+
+    private void publishCollectedEvent(int day, String animalId, ItemStack product) {
+        // event bus opsional, jadi service tetep bisa dipakai tanpa event
+        if (eventBus != null) {
+            eventBus.publish(new AnimalProductCollected(day, animalId, product.getItemId(), product.getQuantity()));
+        }
+    }
+}
+
