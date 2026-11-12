@@ -61,3 +61,35 @@ import java.util.List;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class WeatherService{
+    private final List<AbstractWeatherState> cycle;
+    private int currentIndex;
+
+    public WeatherService(List<AbstractWeatherState> customCycle){
+        if (customCycle == null || customCycle.isEmpty()) {
+             this.cycle = List.of(new SunnyWeather(), new CloudyWeather(), new RainyWeather());
+        } else {
+            this.cycle = List.copyOf(customCycle);
+        }
+
+        this.currentIndex = 0;
+    }
+
+    public WeatherService(){
+        this(List.of(new SunnyWeather(), new CloudyWeather(), new RainyWeather()));
+    }
+
+    public WeatherSnapshot getCurrentWeather(){
+        return cycle.get(currentIndex).toSnapshot();
+    }
+
+    public WeatherSnapshot advanceToNextWeather(){
+        currentIndex = (currentIndex + 1) % cycle.size();
+        return getCurrentWeather();
+    }
+
+    public void reset(){
+        this.currentIndex = 0;
+    }
+}
