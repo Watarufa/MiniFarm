@@ -42,3 +42,24 @@ import minifarm.core.api.ResultCode;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class BatchSalePolicy extends AbstractSalePolicy{
+    // Constructor
+    public BatchSalePolicy() {
+        super("BatchSalePolicy");
+    }
+
+    // Overriding Parent Method
+    @Override 
+    public OperationResult<Void> validateSale(String itemId, int quantity, boolean canSell) {
+        if (!canSell) {
+            return OperationResult.failed(ResultCode.NOT_ALLOWED, "Item ini tidak dapat dijual");
+        }
+        if (quantity < 5) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Penjualan batch ini membutuhkan minimal 5 unit");
+        }
+
+        return OperationResult.ok();
+    }
+
+}

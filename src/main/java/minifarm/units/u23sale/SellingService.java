@@ -9,6 +9,7 @@ import minifarm.core.events.ItemSold;
 import minifarm.core.api.ItemCatalogPort;
 import minifarm.core.api.ItemDefinitionPort;
 import minifarm.core.api.PricingPort;
+
 import java.util.Optional;
 
 /*
@@ -96,3 +97,66 @@ import java.util.Optional;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SellingService {
+    // Attribute
+    private AbstractSalePolicy policy;
+    private final EventBus eventBus;
+
+    // Constructor
+    public SellingService(AbstractSalePolicy policy, EventBus eventBus) {
+        this.policy = policy != null ? policy : new SingleSalePolicy();
+        this.eventBus = eventBus;
+    }    
+
+    // Constructor overloading
+    public SellingService(EventBus eventBus) {
+        this(new SingleSalePolicy(), eventBus);
+    }
+    
+    // Set Policy Method
+    public void setPolicy(AbstractSalePolicy policy) {
+        if (policy != null) this.policy = policy;
+    }
+
+    // Method sell item
+    public OperationResult<Long> sellItem(String itemId, int quantity, int day, ItemCatalogPort catalog, PricingPort pricingService, InventoryPort inventoryPort, WalletPort walletPort) {
+        // Look for item in the catalog
+        Optional<? extends ItemDefinitionPort> itemOpt = catalog.getItem(itemId);
+
+        // If Empty return exception
+        if (itemOpt.isEmpty()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Item tidak terdaftar: " + itemId);
+        }
+
+        // Get the item
+        ItemDefinitionPort item = itemOpt.get();
+
+        // Validate the sale
+        OperationResult<Void> valRes = policy.validateSale(itemId, quantity, item.canSell());
+        if (valRes.isFailure()) {
+            return OperationResult.failed(valRes.getCode(), valRes.getMessage());
+        }
+
+        // Check the item in Inventory
+        if (!inventoryPort.hasItem(itemId, quantity)) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Stok item tidak mencukupi untuk dijual");
+        }
+
+        long earnings = pricingService.calculatePrice(item.getBasePrice(), quantity, 1);
+
+        OperationResult<Void> removeRes = inventoryPort.removeItem(itemId, quantity);
+        if (removeRes.isFailure()) {
+            return OperationResult.failed(removeRes.getCode(), removeRes.getMessage());
+        }
+
+        walletPort.credit(earnings, "Jual " + itemId + " x" + quantity);
+
+        if (eventBus != null) {
+            eventBus.publish(new ItemSold(day, itemId, quantity, earnings));
+        }
+
+        return OperationResult.ok("Berhasil menjual " + quantity + " " + item.getDisplayName() + " seharga " + earnings + " G", earnings);
+    }
+    
+}

@@ -42,3 +42,22 @@ import minifarm.core.api.ResultCode;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SingleSalePolicy extends AbstractSalePolicy{
+    // Constructor
+    public SingleSalePolicy() {
+        super("SingleSalePolicy");
+    }
+    
+    // Method
+    @Override
+    public OperationResult<Void> validateSale(String itemId, int quantity, boolean canSell) {
+      if (!canSell) {
+          return OperationResult.failed(ResultCode.NOT_ALLOWED, "Item ini tidak dapat dijual");
+      }
+      if (quantity <= 0) {
+          return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Jumlah penjualan harus lebih dari 0");
+      }
+      return OperationResult.ok();
+    }
+}
