@@ -102,3 +102,13 @@ import java.util.Map;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CropHealthService implements CropHealthPort {
+    private final Map<Integer, Integer> cropHealthMap = new HashMap<>();
+    private final EventBus eventBus;
+
+    public CropHealthService() {
+        this(null);
+    }
+
+}
