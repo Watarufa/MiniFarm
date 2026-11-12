@@ -26,3 +26,8 @@ package minifarm.units.u32crophealth;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class FungalThreat extends AbstractCropThreat {
+    public FungalThreat() {
+        super("Infeksi Jamur", 20);
+    }
+}
