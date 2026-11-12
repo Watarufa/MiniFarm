@@ -39,3 +39,20 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class Chicken extends AbstractFarmAnimal {
+
+    public Chicken(String id, String name) {
+        super(id, "chicken", name);
+    }
+
+    @Override
+    public String getRequiredFeedItemId() {
+        return GameConfig.ITEM_ANIMAL_FEED;
+    }
+
+    @Override
+    public String getProducedItemId() {
+        return GameConfig.ITEM_EGG;
+    }
+}

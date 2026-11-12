@@ -37,3 +37,20 @@ package minifarm.units.u15animal;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class Cow extends AbstractFarmAnimal {
+
+    public Cow(String id, String name) {
+        super(id, "cow", name);
+    }
+
+    @Override
+    public String getRequiredFeedItemId() {
+        return "hay";
+    }
+
+    @Override
+    public String getProducedItemId() {
+        return "milk";
+    }
+}
