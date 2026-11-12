@@ -83,3 +83,5 @@ public abstract class AbstractCropThreat {
         return OperationResult.ok();
     }
 }
+
+// commit lagi ada format commit nya ternyata :)

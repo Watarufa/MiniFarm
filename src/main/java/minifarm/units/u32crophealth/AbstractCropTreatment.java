@@ -111,3 +111,5 @@ public abstract class AbstractCropTreatment {
         return OperationResult.ok();
     }
 }
+
+// commit lagi ada format commit nya ternyata :)
