@@ -39,3 +39,18 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class TomatoSeed extends AbstractSeedItem{
+    public TomatoSeed(){
+        super(GameConfig.SEED_TOMATO, "Tomato Seed", GameConfig.TOMATO_SEED_PRICE, GameConfig.CROP_TOMATO);
+    }
+
+    @Override
+    public int getDaysToMature() {
+        return GameConfig.TOMATO_GROWTH_DAYS;
+    }
+
+    @Override
+    public int getBaseYield() {
+        return GameConfig.TOMATO_BASE_YIELD;
+    }
+}

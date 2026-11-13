@@ -40,3 +40,11 @@ package minifarm.units.u03seed;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public interface PlantableSeed {
+    String getSeedId();
+    String getDisplayName();
+    long getPrice();
+    String getCropType();
+    int getDaysToMature();
+    int getBaseYield();
+}

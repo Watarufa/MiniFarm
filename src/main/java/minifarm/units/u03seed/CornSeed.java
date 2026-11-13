@@ -39,3 +39,18 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CornSeed extends AbstractSeedItem{
+    public CornSeed() {
+        super(GameConfig.SEED_CORN, "Corn Seed", GameConfig.CORN_SEED_PRICE, GameConfig.CROP_CORN);
+    }
+    @Override
+    public int getDaysToMature() {
+        return GameConfig.CORN_GROWTH_DAYS;
+    }
+
+    @Override
+    public int getBaseYield() {
+        return GameConfig.CORN_BASE_YIELD;
+    }
+}

@@ -77,3 +77,48 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class SeedCatalog {
+    private final Map<String, PlantableSeed> catalog = new LinkedHashMap<>();
+
+    public SeedCatalog() {
+        registerSeed(new WheatSeed());
+        registerSeed(new CornSeed());
+        registerSeed(new TomatoSeed());
+    }
+
+    public void registerSeed(PlantableSeed seed) {
+        if (seed == null) {
+            throw new IllegalArgumentException("Seed tidak boleh null");
+        }
+        catalog.put(seed.getSeedId(), seed);
+    }
+
+    public Optional<PlantableSeed> getSeed(String seedId) {
+        if (seedId == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(catalog.get(seedId.trim().toLowerCase()));
+    }
+
+    public List<PlantableSeed> getAllSeeds() {
+        return Collections.unmodifiableList(new ArrayList<>(catalog.values()));
+    }
+
+    public boolean containsSeed(String seedId) {
+        if (seedId == null) {
+            return false;
+        }
+        return catalog.containsKey(seedId.trim().toLowerCase());
+    }
+
+    public OperationResult<PlantableSeed> findSeed(String seedId) {
+        Optional<PlantableSeed> seedOpt = getSeed(seedId);
+        if (seedOpt.isEmpty()) {
+            return OperationResult.failed(
+                ResultCode.NOT_FOUND,
+                "Benih tidak ditemukan: " + seedId
+            );
+        }
+        return OperationResult.ok(seedOpt.get());
+    }
+}

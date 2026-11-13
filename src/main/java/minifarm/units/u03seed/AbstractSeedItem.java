@@ -76,3 +76,56 @@ import java.util.Objects;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractSeedItem implements PlantableSeed {
+
+    private final String seedId;
+    private final String displayName;
+    private final long price;
+    private final String cropType;
+
+    protected AbstractSeedItem(String seedId, String displayName, long price, String cropType) {
+        if (seedId == null || seedId.trim().isEmpty()) {
+            throw new IllegalArgumentException("seedId tidak boleh null atau kosong");
+        }
+        if (displayName == null || displayName.trim().isEmpty()) {
+            throw new IllegalArgumentException("displayName tidak boleh null atau kosong");
+        }
+        if (price < 0) {
+            throw new IllegalArgumentException("Harga tidak boleh negatif: " + price);
+        }
+        if (cropType == null || cropType.trim().isEmpty()) {
+            throw new IllegalArgumentException("cropType tidak boleh null atau kosong");
+        }
+        
+        this.seedId = seedId.trim().toLowerCase();
+        this.displayName = displayName.trim();
+        this.price = price;
+        this.cropType = cropType.trim().toLowerCase();
+    }
+
+    @Override
+    public String getSeedId() {
+        return seedId;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public long getPrice() {
+        return price;
+    }
+
+    @Override
+    public String getCropType() {
+        return cropType;
+    }
+
+    @Override
+    public String toString() {
+        return displayName + " (" + seedId + ", " + price + " G)";
+    }
+}
