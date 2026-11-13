@@ -111,4 +111,62 @@ public class CropHealthService implements CropHealthPort {
         this(null);
     }
 
+    public CropHealthService(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
+
+    @Override
+    public int getHealth(int plotIndex) {
+        return cropHealthMap.getOrDefault(plotIndex, 100);
+    }
+
+    @Override
+    public OperationResult<Void> damageCrop(int plotIndex, int damageAmount, String reason) {
+        if (damageAmount < 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Damage tidak boleh negatif");
+        }
+        int cur = getHealth(plotIndex);
+        int next = Math.max(0, cur - damageAmount);
+        cropHealthMap.put(plotIndex, next);
+
+        if (next <= 0 && eventBus != null) {
+            eventBus.publish(new CropDestroyed(1, plotIndex, reason));
+        }
+
+        return OperationResult.ok();
+    }
+
+    @Override
+    public OperationResult<Void> restoreHealth(int plotIndex, int healAmount) {
+        if (healAmount < 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Heal tidak boleh negatif");
+        }
+        int cur = getHealth(plotIndex);
+        if (cur <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Tanaman sudah mati, tidak bisa diobati");
+        }
+        cropHealthMap.put(plotIndex, Math.min(100, cur + healAmount));
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> applyTreatment(int plotIndex, AbstractCropTreatment treatment,
+            InventoryPort inventoryPort, EnergyPort energyPort) {
+        if (treatment == null) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Treatment null");
+        }
+        OperationResult<Void> valRes = treatment.validateAndConsume(inventoryPort, energyPort);
+        if (valRes.isFailure()) {
+            return valRes;
+        }
+
+        OperationResult<Void> healRes = restoreHealth(plotIndex, treatment.getHealAmount());
+        if (healRes.isFailure()) {
+            return healRes;
+        }
+
+        inventoryPort.removeItem(treatment.getRequiredItem(), 1);
+        energyPort.consumeEnergy(treatment.getEnergyCost());
+        return OperationResult.ok();
+    }
+
 }
