@@ -107,3 +107,72 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class WalletService implements WalletPort {
+    private long balance;
+    private final List<AbstractWalletTransaction> ledger = new ArrayList<>();
+    private long transactionCounter = 1;
+
+    public WalletService(long initialBalance) {
+        if (initialBalance < 0) {
+            throw new IllegalArgumentException("Saldo awal tidak boleh negatif");
+        }
+        this.balance = initialBalance;
+    }
+
+    public WalletService() {
+        this(GameConfig.INITIAL_COINS);
+    }
+
+    @Override public long getBalance(){
+        return balance;
+    }
+
+    @Override public OperationResult<Void> debit(long amount, String description) {
+        if (amount <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Jumlah debit harus lebih besar dari 0");
+        }
+
+        DebitTransaction tx = new DebitTransaction("TX-" + (transactionCounter++), amount, description);
+
+        OperationResult<Long> applyRes =tx.apply(balance);
+        
+        if (applyRes.isFailure()) {
+            return OperationResult.failed(applyRes.getCode(), applyRes.getMessage());
+        }
+
+        this.balance =applyRes.getOrNull();
+        ledger.add(tx);
+        return OperationResult.ok();
+    }
+
+    @Override public OperationResult<Void> credit(long amount, String description) {
+        if (amount <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Jumlah kredit harus lebih besar dari 0");
+        }
+        CreditTransaction tx = new CreditTransaction("TX-" + (transactionCounter++), amount, description);
+        OperationResult<Long> applyRes = tx.apply(balance);
+        if (applyRes.isFailure()) {
+            return OperationResult.failed(applyRes.getCode(), applyRes.getMessage());
+        }
+
+        this.balance = applyRes.getOrNull();
+        ledger.add(tx);
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> refund(Long amount, String description) {
+        if (amount <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Jumlah refund harus lebih besar dari 0");
+        }
+        RefundTransaction tx = new RefundTransaction("TX-" + (transactionCounter++), amount, description);
+        this.balance = tx.apply(balance).getOrNull();
+        ledger.add(tx);
+        return OperationResult.ok();
+    }
+
+    public List<AbstractWalletTransaction> getledger() {
+        return Collections.unmodifiableList(ledger);
+    }
+}
