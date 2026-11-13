@@ -68,3 +68,40 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class StatisticsService {
+    private final List<AbstractFarmStatistic> statistics = new ArrayList<>();
+    private final EventBus eventBus;
+
+    public StatisticsService(EventBus eventBus) {
+        this.eventBus = eventBus;
+        statistics.add(new ProductionStatistic());
+        statistics.add(new FinanceStatistic());
+        statistics.add(new AnimalStatistic());
+
+        if (eventBus != null) {
+            eventBus.subscribe(DomainEvent.class, this::onEvent);
+        }
+    }
+
+    public StatisticsService() {
+        this(null);
+    }
+
+    public void onEvent(DomainEvent event) {
+        for (AbstractFarmStatistic stat : statistics) {
+            stat.onEvent(event);
+        }
+    }
+
+    public List<AbstractFarmStatistic> getAllStatistics() {
+        return Collections.unmodifiableList(statistics);
+    }
+
+    public List<String> getSummaryLines() {
+        List<String> lines = new ArrayList<>();
+        for (AbstractFarmStatistic stat : statistics) {
+            lines.add(stat.getMetricName() + " -> " + stat.getFormattedSummary());
+        }
+        return Collections.unmodifiableList(lines);
+    }
+}

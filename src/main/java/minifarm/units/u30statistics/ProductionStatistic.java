@@ -59,3 +59,33 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class ProductionStatistic extends AbstractFarmStatistic {
+    private int totalCropsHarvested = 0;
+    private int totalAnimalProductsCollected = 0;
+
+    public ProductionStatistic() {
+        super("Statistik Produksi");
+    }
+
+    public int getTotalCropsHarvested() {
+        return totalCropsHarvested;
+    }
+
+    public int getTotalAnimalProductsCollected() {
+        return totalAnimalProductsCollected;
+    }
+
+    @Override
+    public void onEvent(DomainEvent event) {
+        if (event instanceof CropHarvested harvest) {
+            totalCropsHarvested += harvest.getQuantity();
+        } else if (event instanceof AnimalProductCollected product) {
+            totalAnimalProductsCollected += product.getQuantity();
+        }
+    }
+
+    @Override
+    public String getFormattedSummary() {
+        return "Total Panen: " + totalCropsHarvested + " | Produk Ternak: " + totalAnimalProductsCollected;
+    }
+}

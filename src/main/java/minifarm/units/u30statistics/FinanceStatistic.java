@@ -61,3 +61,37 @@ import minifarm.core.events.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class FinanceStatistic extends AbstractFarmStatistic {
+    private long totalEarned = 0;
+    private long totalSpent = 0;
+
+    public FinanceStatistic() {
+        super("Statistik Keuangan");
+    }
+
+    public long getTotalEarned() {
+        return totalEarned;
+    }
+
+    public long getTotalSpent(){
+        return totalSpent;
+    }
+
+    @Override
+    public void onEvent(DomainEvent event) {
+        if (event instanceof ItemSold sold) {
+            totalEarned += sold.getTotalPrice();
+        } else if (event instanceof OrderCompleted order) {
+            totalEarned += order.getRewardCoins();
+        } else if (event instanceof ItemPurchased purchase) {
+            totalSpent += purchase.getTotalPrice();
+        } else if (event instanceof FarmUpgradePurchased up) {
+            totalSpent += up.getCost();
+        }
+    }
+
+    @Override
+    public String getFormattedSummary() {
+        return "Total Pemasukan: " + totalEarned + " G | Total Pengeluaran: " + totalSpent + " G";
+    }
+}

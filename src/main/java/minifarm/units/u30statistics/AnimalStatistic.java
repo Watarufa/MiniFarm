@@ -51,3 +51,26 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class AnimalStatistic extends AbstractFarmStatistic {
+    private int totalFeedings = 0;
+
+    public AnimalStatistic() {
+        super("Statistik Hewan");
+    }
+    
+    public int getTotalFeedings() {
+        return totalFeedings;
+    }
+
+    @Override
+    public void onEvent(DomainEvent event) {
+        if (event instanceof AnimalFed) {
+            totalFeedings++;
+        }
+    }
+
+    @Override
+    public String getFormattedSummary() {
+        return "Total Pakan Diberikan: " + totalFeedings + " kali";
+    }
+}
