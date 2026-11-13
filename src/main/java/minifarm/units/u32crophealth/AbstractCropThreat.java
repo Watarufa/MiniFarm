@@ -14,12 +14,12 @@ import java.util.Optional;
  * 
  * Deskripsi Kelas:
  * Kelas abstrak dasar ancaman kesehatan tanaman (Hama atau Penyakit).
+ *
  * 
  * ------------------------------------------------------------------------------------------------
  * 1. DEKLARASI KELAS / INTERFACE:
  * ------------------------------------------------------------------------------------------------
  * - Deklarasikan: public abstract class AbstractCropThreat
- * 
  * ------------------------------------------------------------------------------------------------
  * 2. ATRIBUT / FIELDS YANG HARUS DIDEKLARASIKAN:
  * ------------------------------------------------------------------------------------------------
@@ -57,3 +57,31 @@ import java.util.Optional;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractCropThreat {
+    private final String threatName;
+    private final int damageAmount;
+
+    public AbstractCropThreat(String threatName, int damageAmount) {
+        this.threatName = threatName;
+        this.damageAmount = damageAmount;
+    }
+
+    public String getThreatName() {
+        return threatName;
+    }
+
+    public int getDamageAmount() {
+        return damageAmount;
+    }
+
+    public OperationResult<Void> applyToPlot(int plotIndex, CropSlotPort slotPort) {
+        Optional<CropSnapshot> cropOpt = slotPort.getCropSnapshot(plotIndex);
+        if (cropOpt.isEmpty()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Tidak ada tanaman di petak #" + plotIndex);
+        }
+        return OperationResult.ok();
+    }
+}
+
+// commit lagi ada format commit nya ternyata :)

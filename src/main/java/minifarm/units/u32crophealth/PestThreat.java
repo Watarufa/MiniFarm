@@ -26,3 +26,8 @@ package minifarm.units.u32crophealth;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class PestThreat extends AbstractCropThreat {
+    public PestThreat() {
+        super("Serangan Hama", 30);
+    }
+}

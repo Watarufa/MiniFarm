@@ -71,3 +71,45 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractCropTreatment {
+    private final String treatmentName;
+    private final String requiredItem;
+    private final int healAmount;
+    private final int energyCost;
+
+    protected AbstractCropTreatment(String treatmentName, String requiredItem, int healAmount, int energyCost) {
+        this.treatmentName = treatmentName;
+        this.requiredItem = requiredItem;
+        this.healAmount = healAmount;
+        this.energyCost = energyCost > 0 ? energyCost : GameConfig.ENERGY_COST_CROP_TREATMENT;
+    }
+
+    public String getTreatmentName() {
+        return treatmentName;
+    }
+
+    public String getRequiredItem() {
+        return requiredItem;
+    }
+
+    public int getHealAmount() {
+        return healAmount;
+    }
+
+    public int getEnergyCost() {
+        return energyCost;
+    }
+
+    public OperationResult<Void> validateAndConsume(InventoryPort inventory, EnergyPort energy) {
+        if (energy.getCurrentEnergy() < energyCost) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ENERGY, "Energi tidak cukup untuk treatment");
+        }
+        if (!inventory.hasItem(requiredItem, 1)) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Item obat tidak tersedia: " + requiredItem);
+        }
+        return OperationResult.ok();
+    }
+}
+
+// commit lagi ada format commit nya ternyata :)

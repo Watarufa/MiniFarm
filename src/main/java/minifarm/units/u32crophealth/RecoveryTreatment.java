@@ -28,3 +28,9 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class RecoveryTreatment extends AbstractCropTreatment {
+    public RecoveryTreatment() {
+        super("Recovery Treatment", GameConfig.ITEM_MEDICINE, 40, GameConfig.ENERGY_COST_CROP_TREATMENT);
+    }
+}

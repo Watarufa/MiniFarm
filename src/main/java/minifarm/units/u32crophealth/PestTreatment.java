@@ -28,3 +28,9 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class PestTreatment extends AbstractCropTreatment {
+    public PestTreatment() {
+        super("Pest Treatment", GameConfig.ITEM_PESTICIDE, 30, GameConfig.ENERGY_COST_CROP_TREATMENT);
+    }
+}
