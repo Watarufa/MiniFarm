@@ -53,3 +53,29 @@ import minifarm.core.api.WeatherSnapshot;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractWeatherState{
+    private final String weatherName;
+
+    protected AbstractWeatherState(String weatherName){
+        this.weatherName = weatherName;
+    }
+    
+    public String getWeatherName(){
+        return weatherName;
+    }
+
+    public abstract boolean providesRain();
+
+    public abstract double getGrowthModifier();
+    
+
+    public WeatherSnapshot toSnapshot(){
+        return new WeatherSnapshot(weatherName, providesRain(), getGrowthModifier());
+    }
+
+    @Override
+    public String toString(){
+        return weatherName;
+    } 
+}

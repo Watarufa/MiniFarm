@@ -37,3 +37,18 @@ package minifarm.units.u07weather;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CloudyWeather extends AbstractWeatherState{
+    public CloudyWeather(){
+        super("CLOUDY");
+    }
+    @Override
+    public boolean providesRain(){
+        return false;
+    }
+
+    @Override 
+    public double getGrowthModifier(){
+        return 1.0;
+    }
+}
