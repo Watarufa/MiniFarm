@@ -62,3 +62,36 @@ import minifarm.core.api.OperationResult;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractWalletTransaction {
+    private final String transactionId;
+    private final long amount;
+    private final String description;
+    private final long timestamp = System.currentTimeMillis();
+
+    protected AbstractWalletTransaction(String transactionId, long amount, String description) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Jumlah transaksi harus positif");
+        }
+        this.transactionId = transactionId;
+        this.amount = amount;
+        this.description = description != null ? description : "";
+    }
+
+    public String getTransactionId(){
+        return transactionId;
+    }
+
+    public long getAmount(){
+        return amount;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+    public long getTimestamp(){
+        return timestamp;
+    }
+    
+    public abstract OperationResult<Long> apply(long currentBalance);
+}

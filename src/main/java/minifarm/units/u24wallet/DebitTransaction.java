@@ -39,3 +39,16 @@ import minifarm.core.api.ResultCode;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class DebitTransaction extends AbstractWalletTransaction {
+    public DebitTransaction(String id, long amount, String desc) {
+        super(id, amount, desc);
+    }
+
+    @Override public OperationResult<Long> apply (long currentBalance) {
+        if (currentBalance < getAmount()) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_FUNDS, "Saldo tidak cukup untuk debit: " + getAmount());
+        }
+        return OperationResult.ok(currentBalance - getAmount());
+    }
+}
