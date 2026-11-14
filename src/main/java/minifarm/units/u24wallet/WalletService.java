@@ -172,7 +172,7 @@ public class WalletService implements WalletPort {
         return OperationResult.ok();
     }
 
-    public List<AbstractWalletTransaction> getledger() {
+    public List<AbstractWalletTransaction> getLedger() {
         return Collections.unmodifiableList(ledger);
     }
 }
