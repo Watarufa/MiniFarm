@@ -43,3 +43,17 @@ import java.util.Map;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractInventoryPolicy{
+    private final String policyName;
+
+    protected AbstractInventoryPolicy(String policyName){
+        this.policyName = policyName;
+    }
+
+    public String getPolicyName(){
+        return policyName;
+    }
+
+    public abstract OperationResult<Void> validateCanAdd(String itemId, int quantity, Map<String, Integer> currentSlots, int maxCapacity);
+}
