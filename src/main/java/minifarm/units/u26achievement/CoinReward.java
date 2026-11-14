@@ -47,3 +47,26 @@ import minifarm.core.api.WalletPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+// Mewarisi AbstractReward
+public class CoinReward extends AbstractReward {
+
+    // Jumlah koin yang akan diberikan
+    private final long coins;
+
+    public CoinReward(long coins) {
+        // Deskripsi dibuat dari jumlah koin
+        super(coins + " Coins");
+        this.coins = coins;
+    }
+
+    @Override
+    public OperationResult<Void> grant(WalletPort wallet, InventoryPort inventory, ExperiencePort experience) {
+        // Hanya wallet yang dipakai, dicek null dulu agar aman
+        if (wallet != null) {
+            return wallet.credit(coins, "Achievement Reward: " + coins + " Koin");
+        }
+        // Kalau wallet kosong, anggap berhasil
+        return OperationResult.ok();
+    }
+}

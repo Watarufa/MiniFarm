@@ -36,3 +36,18 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+// Mewarisi AbstractAchievementCondition
+public class FirstHarvestCondition extends AbstractAchievementCondition {
+
+    public FirstHarvestCondition() {
+        // Kirim deskripsi ke class induk
+        super("Panen tanaman pertama kali");
+    }
+
+    @Override
+    public boolean isMetBy(DomainEvent event) {
+        // Terpenuhi kalau eventnya adalah panen
+        return event instanceof CropHarvested;
+    }
+}

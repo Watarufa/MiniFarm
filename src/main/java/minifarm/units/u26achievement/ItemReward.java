@@ -49,3 +49,29 @@ import minifarm.core.api.WalletPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+// Mewarisi AbstractReward
+public class ItemReward extends AbstractReward {
+
+    // ID dan jumlah item yang akan diberikan
+    private final String itemId;
+    private final int quantity;
+
+    public ItemReward(String itemId, int quantity) {
+        // Deskripsi dibuat dari jumlah dan ID item
+        super(quantity + "x " + itemId);
+        this.itemId = itemId;
+        this.quantity = quantity;
+    }
+
+    @Override
+    public OperationResult<Void> grant(WalletPort wallet, InventoryPort inventory, ExperiencePort experience) {
+        // Hanya inventory yang dipakai, dicek null dulu agar aman
+        if (inventory != null) {
+            return inventory.addItem(itemId, quantity);
+        }
+        // Kalau inventory kosong, anggap berhasil
+        return OperationResult.ok();
+    }
+}

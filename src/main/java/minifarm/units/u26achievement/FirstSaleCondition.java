@@ -36,3 +36,19 @@ import minifarm.core.events.ItemSold;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+// Mewarisi AbstractAchievementCondition
+public class FirstSaleCondition extends AbstractAchievementCondition {
+
+    public FirstSaleCondition() {
+        // Kirim deskripsi ke class induk
+        super("Penjualan pertama di pasar");
+    }
+
+    @Override
+    public boolean isMetBy(DomainEvent event) {
+        // Terpenuhi kalau eventnya adalah penjualan
+        return event instanceof ItemSold;
+    }
+}
