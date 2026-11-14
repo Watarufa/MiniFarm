@@ -42,3 +42,22 @@ import minifarm.core.api.OperationResult;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public abstract class AbstractSalePolicy {
+    // Atribute
+    private final String policyName;
+
+    // Constructor
+    public AbstractSalePolicy(String policyName) {
+        this.policyName = policyName;
+    }
+
+    // Method getter
+    public String getPolicyName() {
+        return policyName;
+    }
+
+    // Abstract Method for operation results
+    protected abstract OperationResult<Void> validateSale(String itemId, int quantity, boolean canSell);
+}
