@@ -60,3 +60,36 @@ import minifarm.core.api.ResultCode;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class HousingExpansionUpgrade extends AbstractFarmUpgrade {
+    private final HousingCapacityPort housingPort;
+    private int upgradeLevel = 0;
+    public static final int MAX_HOUSING_UPGRADES = 2;
+
+    public HousingExpansionUpgrade(HousingCapacityPort housingPort) {
+        super("upgrade_housing", "Coop Expansion (+2 Capacity)");
+        this.housingPort = housingPort;
+    }
+
+    @Override
+    public long calculateCost() {
+        return 150L;
+    }
+
+    @Override
+    public boolean isMaxLevel() {
+        return upgradeLevel >= MAX_HOUSING_UPGRADES;
+    }
+
+    @Override
+    public OperationResult<Void> apply() {
+        if (isMaxLevel()) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Kapasitas kandang sudah maksimal");
+        }
+        OperationResult<Void> res = housingPort.expandCapacity("coop", 2);
+        if (res.isSuccess()) {
+            upgradeLevel++;
+        }
+        return res;
+    }
+}

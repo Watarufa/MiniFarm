@@ -60,3 +60,35 @@ import minifarm.core.api.ResultCode;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class PlotExpansionUpgrade extends AbstractFarmUpgrade {
+    private final PlotCapacityPort plotCapacityPort;
+    private int expansionCount = 0;
+
+    public PlotExpansionUpgrade(PlotCapacityPort plotCapacityPort) {
+        super("upgrade_plot_expansion", "Plot Expansion");
+        this.plotCapacityPort = plotCapacityPort;
+    }
+
+    @Override
+    public long calculateCost() {
+        return 100L * (expansionCount + 1);
+    }
+
+    @Override
+    public boolean isMaxLevel() {
+        return plotCapacityPort.getCurrentPlots() >= plotCapacityPort.getMaxPlots();
+    }
+
+    @Override
+    public OperationResult<Void> apply() {
+        if (isMaxLevel()) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Batas maksimum petak (" + plotCapacityPort.getMaxPlots() + ") telah tercapai");
+        }
+        OperationResult<Void> res = plotCapacityPort.expandPlots(1);
+        if (res.isSuccess()) {
+            expansionCount++;
+        }
+        return res;
+    }
+}

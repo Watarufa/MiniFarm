@@ -55,3 +55,27 @@ import minifarm.core.api.WalletPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmUpgrade {
+    private final String upgradeId;
+    private final String upgradeName;
+
+    protected AbstractFarmUpgrade(String upgradeId, String upgradeName) {
+        this.upgradeId = upgradeId;
+        this.upgradeName = upgradeName;
+    }
+
+    public String getUpgradeId() {
+        return upgradeId;
+    }
+
+    public String getUpgradeName() {
+        return upgradeName;
+    }
+
+    public abstract long calculateCost();
+
+    public abstract boolean isMaxLevel();
+
+    public abstract OperationResult<Void> apply();
+}

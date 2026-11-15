@@ -60,3 +60,36 @@ import minifarm.core.api.StorageCapacityPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class StorageExpansionUpgrade extends AbstractFarmUpgrade {
+    private final StorageCapacityPort storagePort;
+    private int upgradeLevel = 0;
+    public static final int MAX_STORAGE_UPGRADES = 3;
+
+    public StorageExpansionUpgrade(StorageCapacityPort storagePort) {
+        super("upgrade_storage", "Storage Expansion (+10 slots)");
+        this.storagePort = storagePort;
+    }
+
+    @Override
+    public long calculateCost() {
+        return 150L;
+    }
+
+    @Override
+    public boolean isMaxLevel() {
+        return upgradeLevel >= MAX_STORAGE_UPGRADES;
+    }
+
+    @Override
+    public OperationResult<Void> apply() {
+        if (isMaxLevel()) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Kapasitas storage sudah mencapai batas upgrade");
+        }
+        OperationResult<Void> res = storagePort.expandStorageCapacity(10);
+        if (res.isSuccess()) {
+            upgradeLevel++;
+        }
+        return res;
+    }
+}

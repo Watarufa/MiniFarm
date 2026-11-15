@@ -55,3 +55,32 @@ import minifarm.core.api.PlotCapacityPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class ProtectedPlotUpgrade extends AbstractFarmUpgrade {
+    private final PlotCapacityPort plotCapacityPort;
+    private int targetPlotIndex = 0;
+
+    public ProtectedPlotUpgrade(PlotCapacityPort plotCapacityPort) {
+        super("upgrade_protected_plot", "Greenhouse Protected Plot");
+        this.plotCapacityPort = plotCapacityPort;
+    }
+
+    public void setTargetPlotIndex(int targetPlotIndex) {
+        this.targetPlotIndex = targetPlotIndex;
+    }
+
+    @Override
+    public long calculateCost() {
+        return 200L;
+    }
+
+    @Override
+    public boolean isMaxLevel() {
+        return false;
+    }
+
+    @Override
+    public OperationResult<Void> apply() {
+        return plotCapacityPort.convertToProtectedPlot(targetPlotIndex);
+    }
+}
