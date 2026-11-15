@@ -45,3 +45,23 @@ import minifarm.core.api.WalletPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+// Kerangka dasar untuk semua jenis hadiah
+public abstract class AbstractReward {
+
+    // Deskripsi dibuat private agar tidak bisa diubah dari luar
+    private final String description;
+
+    // Constructor protected agar hanya subclass yang bisa memanggil
+    protected AbstractReward(String description) {
+        this.description = description;
+    }
+
+    // Getter untuk membaca deskripsi
+    public String getDescription() {
+        return description;
+    }
+
+    // Diisi oleh subclass, tiap hadiah punya cara memberi yang berbeda
+    public abstract OperationResult<Void> grant(WalletPort wallet, InventoryPort inventory, ExperiencePort experience);
+}

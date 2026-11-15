@@ -42,3 +42,23 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+// Kerangka dasar untuk semua syarat achievement
+public abstract class AbstractAchievementCondition {
+
+    // Deskripsi dibuat private agar tidak bisa diubah dari luar
+    private final String description;
+
+    // Constructor protected agar hanya subclass yang bisa memanggil
+    protected AbstractAchievementCondition(String description) {
+        this.description = description;
+    }
+
+    // Getter untuk membaca deskripsi
+    public String getDescription() {
+        return description;
+    }
+
+    // Diisi oleh subclass sesuai syaratnya masing-masing
+    public abstract boolean isMetBy(DomainEvent event);
+}

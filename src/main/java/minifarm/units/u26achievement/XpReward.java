@@ -49,3 +49,28 @@ import minifarm.core.api.WalletPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+// Mewarisi AbstractReward
+public class XpReward extends AbstractReward {
+
+    // Kategori skill dan jumlah XP yang akan diberikan
+    private final String skillCategory;
+    private final int xpAmount;
+
+    public XpReward(String skillCategory, int xpAmount) {
+        // Deskripsi dibuat dari jumlah XP dan kategori
+        super(xpAmount + " XP [" + skillCategory + "]");
+        this.skillCategory = skillCategory;
+        this.xpAmount = xpAmount;
+    }
+
+    @Override
+    public OperationResult<Void> grant(WalletPort wallet, InventoryPort inventory, ExperiencePort experience) {
+        // Hanya experience yang dipakai, dicek null dulu agar aman
+        if (experience != null) {
+            // addExperience tidak mengembalikan hasil, jadi cukup dipanggil
+            experience.addExperience(skillCategory, xpAmount);
+        }
+        return OperationResult.ok();
+    }
+}
