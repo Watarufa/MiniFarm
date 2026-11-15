@@ -111,3 +111,83 @@ import minifarm.core.api.AnimalSnapshot;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmAnimal {
+    private final String id;
+    private final String species;
+    private final String name;
+    private int health;
+    private boolean fed;
+    private boolean clean;
+
+    protected AbstractFarmAnimal(String id, String species, String name) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID hewan tidak boleh kosong");
+        }
+        if (species == null || species.trim().isEmpty()) {
+            throw new IllegalArgumentException("Species tidak boleh kosong");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nama hewan tidak boleh kosong");
+        }
+        this.id = id.trim();
+        this.species = species.trim().toLowerCase();
+        this.name = name.trim();
+        this.health = 100;
+        this.fed = false;
+        this.clean = true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public boolean isFed() {
+        return fed;
+    }
+
+    public void setFed(boolean fed) {
+        this.fed = fed;
+    }
+
+    public boolean isClean() {
+        return clean;
+    }
+
+    public void setClean(boolean clean) {
+        this.clean = clean;
+    }
+
+    public void applyHealthChange(int amount) {
+        this.health = Math.max(0, Math.min(100, this.health + amount));
+    }
+
+    public boolean isHealthy() {
+        return health > 50;
+    }
+
+    public AnimalSnapshot toSnapshot() {
+        return new AnimalSnapshot(id, species, name, health, fed, clean);
+    }
+  
+    public abstract String getRequiredFeedItemId();
+    
+    public abstract String getProducedItemId();
+  
+    @Override 
+    public String toString() { 
+        return name + " (" + species + ", HP: " + health + ", Makan: " + fed + ")";
+    }
+}

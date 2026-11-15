@@ -103,3 +103,74 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class AnimalService implements FarmAnimalPort {
+    private final Map<String, AbstractFarmAnimal> animals = new LinkedHashMap<>();
+
+    public AnimalService() {
+        register(new Chicken("chicken_1", "Clucky"));
+        register(new Chicken("chicken_2", "Penny"));
+    }
+
+    public void register(AbstractFarmAnimal animal) {
+        if (animal != null) {
+            animals.put(animal.getId(), animal);
+        }
+    }
+
+    public AbstractFarmAnimal getAnimalEntity(String animalId) {
+        if (animalId == null) return null;
+        return animals.get(animalId);
+    }
+
+    @Override
+    public List<AnimalSnapshot> getAllAnimals() {
+        List<AnimalSnapshot> list = new ArrayList<>();
+        for (AbstractFarmAnimal a : animals.values()) {
+            list.add(a.toSnapshot());
+        }
+        return Collections.unmodifiableList(list);
+    }
+
+    @Override
+    public Optional<AnimalSnapshot> getAnimal(String animalId) {
+        AbstractFarmAnimal a = getAnimalEntity(animalId);
+        return a != null ? Optional.of(a.toSnapshot()) : Optional.empty();
+    }
+
+    @Override 
+    public OperationResult<Void> feedAnimal(String animalId, String feedItemId) {
+        AbstractFarmAnimal animal = getAnimalEntity(animalId);
+        if (animal == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Hewan tidak ditemukan: " + animalId);
+        }
+        if (animal.isFed()) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, animal.getName() + " sudah kenyang hari ini");
+        }
+        if (!animal.getRequiredFeedItemId().equalsIgnoreCase(feedItemId)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Pakan tidak cocok. Butuh: " + animal.getRequiredFeedItemId());
+        }
+
+        animal.setFed(true);
+        return OperationResult.ok();
+    }
+
+    @Override 
+    public OperationResult<Void> careAnimal(String animalId, String careType) {
+        AbstractFarmAnimal animal = getAnimalEntity(animalId);
+
+        if (animal == null) {
+           return OperationResult.failed(ResultCode.NOT_FOUND, "Hewan tidak ditemukan: " + animalId);
+        }
+
+        animal.setClean(true);
+        animal.applyHealthChange(5);
+        return OperationResult.ok();
+    }
+
+    public void resetDailyAnimalState() {
+        for(AbstractFarmAnimal a : animals.values()) {
+            a.setFed(false);
+        }
+    }
+}
