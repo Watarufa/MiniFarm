@@ -98,3 +98,62 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class FarmUpgradeService {
+    private final Map<String, AbstractFarmUpgrade> upgrades = new LinkedHashMap<>();
+    private final EventBus eventBus;
+
+    public FarmUpgradeService(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
+
+    public void registerUpgrade(AbstractFarmUpgrade upgrade) {
+        if (upgrade != null) {
+            upgrades.put(upgrade.getUpgradeId(), upgrade);
+        }
+    }
+
+    public List<AbstractFarmUpgrade> getAllUpgrades() {
+        return Collections.unmodifiableList(new ArrayList<>(upgrades.values()));
+    }
+
+    public Optional<AbstractFarmUpgrade> getUpgrade(String upgradeId) {
+        if (upgradeId == null) return Optional.empty();
+        return Optional.ofNullable(upgrades.get(upgradeId));
+    }
+
+    public OperationResult<Void> purchaseUpgrade(String upgradeId, int day, WalletPort walletPort) {
+        Optional<AbstractFarmUpgrade> upOpt = getUpgrade(upgradeId);
+        if (upOpt.isEmpty()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Upgrade tidak ditemukan: " + upgradeId);
+        }
+        AbstractFarmUpgrade upgrade = upOpt.get();
+
+        if (upgrade.isMaxLevel()) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Fasilitas sudah mencapai level maksimum");
+        }
+
+        long cost = upgrade.calculateCost();
+        if (walletPort.getBalance() < cost) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_FUNDS, "Saldo koin tidak cukup untuk upgrade (Butuh: " + cost + " G)");
+        }
+
+        OperationResult<Void> debitRes = walletPort.debit(cost, "Beli upgrade " + upgrade.getUpgradeName());
+        if (debitRes.isFailure()) {
+            return debitRes;
+        }
+
+        OperationResult<Void> applyRes = upgrade.apply();
+        if (applyRes.isFailure()) {
+            // Kompensasi jika apply gagal
+            walletPort.credit(cost, "Refund gagal upgrade " + upgrade.getUpgradeName());
+            return applyRes;
+        }
+
+        if (eventBus != null) {
+            eventBus.publish(new FarmUpgradePurchased(day, upgrade.getUpgradeId(), cost));
+        }
+
+        return OperationResult.ok();
+    }
+}
