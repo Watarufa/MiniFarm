@@ -117,3 +117,93 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class InventoryService implements InventoryPort {
+    private final int capacity;
+    private final Map<String, Integer> items = new LinkedHashMap<>();
+    private AbstractInventoryPolicy policy;
+
+    public InventoryService(int capacity, AbstractInventoryPolicy policy) {
+        this.capacity = capacity;
+        this.policy = policy != null ? policy : new SlotCapacityPolicy();
+    }
+
+    public InventoryService() {
+        this(GameConfig.INVENTORY_SLOT_CAPACITY, new SlotCapacityPolicy());
+    }
+
+    public void setPolicy(AbstractInventoryPolicy policy) {
+        if (policy != null) {
+            this.policy = policy;
+        }
+    }
+
+    @Override
+    public boolean hasItem(String itemId, int quantity) {
+        if (itemId == null || quantity <= 0) {
+            return false;
+        }
+        return items.getOrDefault(itemId.trim().toLowerCase(), 0) >= quantity;
+    }
+
+    @Override
+    public int getItemQuantity(String itemId) {
+        if (itemId == null) {
+            return 0;
+        }
+        return items.getOrDefault(itemId.trim().toLowerCase(), 0);
+    }
+
+    @Override
+    public OperationResult<Void> addItem(String itemId, int quantity) {
+        if (itemId == null || itemId.trim().isEmpty() || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item atau kuantitas tidak valid");
+        }
+
+        String id = itemId.trim().toLowerCase();
+        OperationResult<Void> valRes = policy.validateCanAdd(id, quantity, items, capacity);
+
+        if (valRes.isFailure()) {
+            return valRes;
+        }
+
+        items.put(id, items.getOrDefault(id, 0) + quantity);
+        return OperationResult.ok();
+    }
+
+    @Override
+    public OperationResult<Void> removeItem(String itemId, int quantity) {
+        if (itemId == null || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item atau kuantitas tidak valid");
+        }
+        String id = itemId.trim().toLowerCase();
+        int current = items.getOrDefault(id, 0);
+        if (current < quantity) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Jumlah item tidak mencukupi di inventaris");
+        }
+
+        if (current == quantity) {
+            items.remove(id);
+        } else {
+            items.put(id, current - quantity);
+        }
+        return OperationResult.ok();
+    }
+
+    @Override
+    public int getAvailableSlots(){
+        return Math.max(0, capacity - items.size());
+    }
+
+    @Override
+    public int getTotalCapacity(){
+        return capacity;
+    }
+
+    @Override
+    public List<ItemStack> getItems(){
+        List<ItemStack> list = new ArrayList<>();
+        items.forEach((id, qty) -> list.add(new ItemStack(id, qty)));
+        return Collections.unmodifiableList(list);
+    }
+}

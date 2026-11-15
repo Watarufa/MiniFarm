@@ -44,3 +44,22 @@ import java.util.Map;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SlotCapacityPolicy extends AbstractInventoryPolicy{
+    
+    public SlotCapacityPolicy(){
+        super("SlotCapacityPolicy");
+    }
+
+    @Override
+    public OperationResult<Void> validateCanAdd(String itemId, int quantity, Map<String, Integer> currentSlots, int maxCapacity){
+        if (itemId == null || itemId.trim().isEmpty() || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item atau kuantitas tidak valid");
+        }
+        String id = itemId.trim().toLowerCase();
+        if (!currentSlots.containsKey(id) && currentSlots.size() >= maxCapacity) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Slot inventaris penuh (" + maxCapacity + " slot)");
+        }
+        return OperationResult.ok();
+    }
+}

@@ -54,3 +54,28 @@ import java.util.Set;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CategoryRestrictedPolicy extends AbstractInventoryPolicy{
+
+    private final Set<String> allowedPrefixes;
+
+    public CategoryRestrictedPolicy(Set<String> allowedPrefixes){
+        super("CategoryRestrictedPolicy");
+        this.allowedPrefixes = allowedPrefixes != null ? allowedPrefixes : Set.of();
+    }
+
+    @Override
+    public OperationResult<Void> validateCanAdd(String itemId, int quantity, Map<String, Integer> currentSlots, int maxCapacity){
+        if (itemId == null || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item tidak valid");
+        }
+        boolean match = allowedPrefixes.stream().anyMatch(itemId.toLowerCase()::startsWith);
+        if (!match) {
+            return OperationResult.failed(ResultCode.NOT_ALLOWED, "Kategori item tidak diizinkan dalam inventaris khusus ini");
+        }
+        if (!currentSlots.containsKey(itemId.toLowerCase()) && currentSlots.size() >= maxCapacity) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Slot penuh");
+        }
+        return OperationResult.ok();
+    }
+}
