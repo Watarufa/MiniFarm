@@ -1,46 +1,34 @@
 package minifarm.units.u17animalproduction;
 
-import minifarm.core.api.AnimalSnapshot;
-import minifarm.core.api.ItemStack;
+import java.util.Locale;
 import java.util.Optional;
 
-/*
- * ================================================================================================
- * PETUNJUK SPESIFIKASI KELAS (KOSONGAN - KETIK SENDIRI DARI NOL): AbstractAnimalProductionRule
- * ================================================================================================
- * Modul Unit: U17ANIMALPRODUCTION
- * 
- * Deskripsi Kelas:
- * Kelas abstrak aturan produksi harian hewan (Polimorfik).
- * 
- * ------------------------------------------------------------------------------------------------
- * 1. DEKLARASI KELAS / INTERFACE:
- * ------------------------------------------------------------------------------------------------
- * - Deklarasikan: public abstract class AbstractAnimalProductionRule
- * 
- * ------------------------------------------------------------------------------------------------
- * 2. ATRIBUT / FIELDS YANG HARUS DIDEKLARASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. private final String species;
- * 
- * ------------------------------------------------------------------------------------------------
- * 3. CONSTRUCTOR YANG HARUS DIBUAT:
- * ------------------------------------------------------------------------------------------------
- * 1. Constructor: protected AbstractAnimalProductionRule(String species)
- *    Logika Implementasi:
- *      this.species = species.toLowerCase();
- * 
- * ------------------------------------------------------------------------------------------------
- * 4. METHOD-METHOD YANG HARUS DIIMPLEMENTASIKAN:
- * ------------------------------------------------------------------------------------------------
- * 1. public String getSpecies()
- *    Logika Implementasi:
- *      return species;
- * 
- * 2. public abstract Optional<ItemStack> calculateDailyProduction(AnimalSnapshot animal)
- *    (Merupakan method abstract / method interface tanpa body)
- * 
- * ================================================================================================
- * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
- * ================================================================================================
- */
+import minifarm.core.api.AnimalSnapshot;
+import minifarm.core.api.ItemStack;
+
+// abstract class: cetakan dasar buat aturan produksi tiap jenis hewan
+// ga bisa di new lgsg, harus lewat aturan ayam, sapi / domba
+public abstract class AbstractAnimalProductionRule {
+
+    // species dibuat private final biar identitas aturan ga bisa diganti dari luar
+    private final String species;
+
+    // protected: constructor ini dipake kelas anak lewat super
+    protected AbstractAnimalProductionRule(String species) {
+        // validasi dulu supaya species gak null atau cuma berisi spasi
+        if (species == null || species.trim().isEmpty()) {
+            throw new IllegalArgumentException("Spesies tidak boleh kosong");
+        }
+        this.species = species.trim().toLowerCase(Locale.ROOT);
+    }
+
+    // getter: cara baca species yg fieldnya tetep private
+    public String getSpecies() {
+        return species;
+    }
+
+    // method abstract: tiap aturan hewan menentukan sendiri produk yg dihasilkan
+    // optional kosong artinya hewan belum memenuhi syarat buat produksi
+    public abstract Optional<ItemStack> calculateDailyProduction(AnimalSnapshot animal);
+}
+
