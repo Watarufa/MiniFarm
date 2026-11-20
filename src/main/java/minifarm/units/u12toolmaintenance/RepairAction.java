@@ -64,3 +64,37 @@ import minifarm.core.api.MaintainableTool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class RepairAction extends AbstractMaintenanceAction {
+    public static final long REPAIR_COST = 20L;
+
+    public RepairAction() {
+        super("Repair Tool");
+    }
+
+    @Override
+    public long calculateCost(MaintainableTool tool) {
+        return REPAIR_COST;
+    }
+
+    @Override
+    public OperationResult<Void> execute(MaintainableTool tool, WalletPort walletPort) {
+        if (tool == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Alat tidak ditemukan");
+        }
+        if (tool.getDurability() >= tool.getMaxDurability()) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, "Alat masih dalam kondisi prima (durability penuh)");
+        }
+        if (walletPort.getBalance() < REPAIR_COST) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_FUNDS, "Saldo koin tidak cukup untuk perbaikan (" + REPAIR_COST + " G)");
+        }
+        
+        OperationResult<Void> debitRes = walletPort.debit(REPAIR_COST, "Repair " + tool.getToolName());
+        if (debitRes.isFailure()) {
+            return debitRes;
+        }
+        
+        tool.repair();
+        return OperationResult.ok();
+    }
+}
