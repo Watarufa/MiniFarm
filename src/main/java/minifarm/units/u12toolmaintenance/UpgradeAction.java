@@ -66,3 +66,39 @@ import minifarm.core.api.MaintainableTool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class UpgradeAction extends AbstractMaintenanceAction {
+    public static final int MAX_TOOL_LEVEL = 3;
+
+    public UpgradeAction() {
+        super("Upgrade Tool");
+    }
+
+    @Override
+    public long calculateCost(MaintainableTool tool) {
+        if (tool == null) return 0;
+        return 50L * tool.getLevel();
+    }
+
+    @Override
+    public OperationResult<Void> execute(MaintainableTool tool, WalletPort walletPort) {
+        if (tool == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Alat tidak ditemukan");
+        }
+        if (tool.getLevel() >= MAX_TOOL_LEVEL) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Alat sudah mencapai level maksimum (" + MAX_TOOL_LEVEL + ")");
+        }
+        long cost = calculateCost(tool);
+        if (walletPort.getBalance() < cost) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_FUNDS, "Saldo koin tidak cukup untuk upgrade (" + cost + " G)");
+        }
+
+        OperationResult<Void> debitRes = walletPort.debit(cost, "Upgrade " + tool.getToolName());
+        if (debitRes.isFailure()) {
+            return debitRes;
+        }
+        
+        tool.setLevel(tool.getLevel() + 1);
+        return OperationResult.ok();
+    }
+}

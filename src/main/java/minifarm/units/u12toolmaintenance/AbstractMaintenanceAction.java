@@ -48,3 +48,19 @@ import minifarm.core.api.MaintainableTool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractMaintenanceAction {
+    private final String actionName;
+
+    protected AbstractMaintenanceAction(String actionName) {
+        this.actionName = actionName;
+    }
+
+    public String getActionName() {
+        return  actionName;
+    }
+
+    public abstract long calculateCost(MaintainableTool tool);
+
+    public abstract OperationResult<Void> execute(MaintainableTool tool, WalletPort walletPort);
+}

@@ -41,3 +41,16 @@ import minifarm.core.api.MaintainableTool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class ToolMaintenanceService {
+    private final RepairAction repairAction = new RepairAction();
+    private final UpgradeAction upgradeAction =  new UpgradeAction();
+
+    public OperationResult<Void> repairTool(MaintainableTool tool, WalletPort walletPort) {
+        return repairAction.execute(tool, walletPort);
+    }
+
+    public OperationResult<Void> upgradeTool(MaintainableTool tool, WalletPort walletPort) {
+        return upgradeAction.execute(tool, walletPort);
+    }
+}
