@@ -35,3 +35,13 @@ import minifarm.core.api.OperationResult;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CreditTransaction extends AbstractWalletTransaction {
+    public CreditTransaction(String id, long amount, String desc) {
+        super(id, amount, desc);
+    }
+
+    @Override public OperationResult<Long> apply(long currentBalance) {
+        return OperationResult.ok(currentBalance + getAmount());
+    }
+}
