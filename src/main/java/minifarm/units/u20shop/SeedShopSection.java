@@ -38,3 +38,18 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class SeedShopSection extends AbstractShopSection {
+
+    public SeedShopSection() {
+        super("Seeds");
+
+        addOffering(GameConfig.SEED_WHEAT, GameConfig.WHEAT_SEED_PRICE);
+        addOffering(GameConfig.SEED_CORN, GameConfig.CORN_SEED_PRICE);
+        addOffering(GameConfig.SEED_TOMATO, GameConfig.TOMATO_SEED_PRICE);
+    }
+
+    @Override
+    public boolean acceptsCategory(String category) {
+        return "seed".equalsIgnoreCase(category) || "resource".equalsIgnoreCase(category);
+    }
+}
