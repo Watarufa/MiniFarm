@@ -35,3 +35,14 @@ import minifarm.core.api.DayContext;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class DayRolloverProcess extends AbstractDailyProcess {
+    public DayRolloverProcess() {
+        super("DayRollover", 90);
+    }
+
+    @Override
+    public void execute(DayContext context) {
+        // Pemulihan energi dan kenaikan hari ditangani oleh DayCycleService.
+    }
+}

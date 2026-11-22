@@ -32,3 +32,11 @@ import minifarm.core.api.DayContext;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public interface DailyProcess {
+    String getName();
+
+    int getOrder();
+
+    void execute(DayContext context);
+}

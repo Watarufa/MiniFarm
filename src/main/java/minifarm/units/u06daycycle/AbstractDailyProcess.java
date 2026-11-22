@@ -44,3 +44,23 @@ package minifarm.units.u06daycycle;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractDailyProcess implements DailyProcess {
+    private final String name;
+    private final int order;
+
+    protected AbstractDailyProcess(String name, int order) {
+        this.name = name;
+        this.order = order;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getOrder() {
+        return order;
+    }
+}

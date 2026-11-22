@@ -119,3 +119,84 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class DayCycleService implements GameClock {
+    private int currentDay;
+    private WeatherSnapshot currentWeather;
+    private final List<DailyProcess> processes = new ArrayList<>();
+    private final List<DailyTickParticipant> participants = new ArrayList<>();
+    private final EventBus eventBus;
+    private final EnergyPort energyPort;
+
+    public DayCycleService(int initialDay, WeatherSnapshot initialWeather, EventBus eventBus, EnergyPort energyPort) {
+        this.currentDay = initialDay;
+        this.currentWeather = initialWeather != null ? initialWeather : new WeatherSnapshot("SUNNY", false, 1.0);
+        this.eventBus = eventBus;
+        this.energyPort = energyPort;
+
+        registerProcess(new PreDayValidationProcess());
+        registerProcess(new DailyResolutionProcess());
+        registerProcess(new DayRolloverProcess());
+    }
+
+    public DayCycleService(EventBus eventBus, EnergyPort energyPort) {
+        this(1, new WeatherSnapshot("SUNNY", false, 1.0), eventBus, energyPort);
+    }
+
+    public void registerProcess(DailyProcess process) {
+        if (process != null) {
+            processes.add(process);
+            processes.sort(Comparator.comparingInt(DailyProcess::getOrder));
+        }
+    }
+
+    public void registerParticipant(DailyTickParticipant participant) {
+        if (participant != null) {
+            participants.add(participant);
+            participants.sort(Comparator.comparingInt(DailyTickParticipant::getExecutionOrder));
+        }
+    }
+
+    @Override
+    public int getCurrentDay() {
+        return currentDay;
+    }
+
+    @Override
+    public WeatherSnapshot getCurrentWeather() {
+        return currentWeather;
+    }
+
+    public void setCurrentWeather(WeatherSnapshot nextWeather) {
+        if (nextWeather != null) {
+            this.currentWeather = nextWeather;
+        }
+    }
+
+    public OperationResult<Void> advanceDay(WeatherSnapshot nextWeather) {
+        DayContext context = new DayContext(currentDay, currentWeather);
+
+        for (DailyProcess process : processes) {
+            process.execute(context);
+        }
+
+        for (DailyTickParticipant participant : participants) {
+            participant.onDayAdvance(context);
+        }
+
+        if (energyPort != null) {
+            energyPort.restoreEnergy(energyPort.getMaxEnergy());
+        }
+
+        currentDay++;
+        if (nextWeather != null) {
+            this.currentWeather = nextWeather;
+        }
+
+        if (eventBus != null) {
+            eventBus.publish(new DayAdvanced(currentDay, currentWeather.getWeatherType()));
+        }
+
+        return OperationResult.ok();
+    }
+}
