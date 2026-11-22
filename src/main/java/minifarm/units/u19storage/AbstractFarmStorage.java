@@ -110,3 +110,82 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmStorage {
+    private final String storageId;
+    private final String storageName;
+    private int capacity;
+    private final Map<String, Integer> items = new LinkedHashMap<>();
+
+    protected AbstractFarmStorage(String storageId, String storageName, int initialCapacity) {
+        this.storageId = storageId;
+        this.storageName = storageName;
+        this.capacity = initialCapacity;
+    }
+
+    public String getStorageId() {
+        return storageId;
+    }
+
+    public String getStorageName() {
+        return storageName;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void expandCapacity(int extra) {
+        if (extra > 0) this.capacity += extra;
+    }
+
+    public int getAvailableSlots() {
+        return Math.max(0, capacity - items.size());
+    }
+
+    public int getItemQuantity(String itemId) {
+        if (itemId == null) return 0;
+        return items.getOrDefault(itemId.toLowerCase(), 0);
+    }
+
+    public List<ItemStack> getStoredItems() {
+        List<ItemStack> list = new ArrayList<>();
+        items.forEach((k, v) -> list.add(new ItemStack(k, v)));
+        return Collections.unmodifiableList(list);
+    }
+
+    public OperationResult<Void> deposit(String itemId, int quantity) {
+        if (itemId == null || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item atau kuantitas tidak valid");
+        }
+        if (!acceptsItem(itemId)) {
+            return OperationResult.failed(ResultCode.NOT_ALLOWED, storageName + " tidak menerima jenis item ini");
+        }
+        String id = itemId.toLowerCase();
+        if (!items.containsKey(id) && items.size() >= capacity) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, storageName + " sudah penuh");
+        }
+        items.put(id, items.getOrDefault(id, 0) + quantity);
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> withdraw(String itemId, int quantity) {
+        if (itemId == null || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Item atau kuantitas tidak valid");
+        }
+        String id = itemId.toLowerCase();
+        int cur = items.getOrDefault(id, 0);
+        if (cur < quantity) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Stok di storage tidak mencukupi");
+        }
+        if (cur == quantity) {
+            items.remove(id);
+        } else {
+            items.put(id, cur - quantity);
+        }
+        return OperationResult.ok();
+    }
+
+    
+    public abstract boolean acceptsItem(String itemId);
+}

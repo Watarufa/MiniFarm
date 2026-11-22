@@ -35,3 +35,15 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class BarnStorage extends AbstractFarmStorage {
+
+    public BarnStorage() {
+        super("barn_storage", "Barn Storage", GameConfig.INITIAL_STORAGE_SLOT_CAPACITY);
+    }
+
+    @Override
+    public boolean acceptsItem(String itemId) {
+        return itemId != null; // Menerima semua item
+    }
+}
