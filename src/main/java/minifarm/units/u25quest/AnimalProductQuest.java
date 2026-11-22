@@ -48,3 +48,23 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class AnimalProductQuest extends AbstractQuest {
+    private final String requiredProductId;
+
+    public AnimalProductQuest(String questId, String title, String productId, int target, long reward){
+        super(questId, title, target, reward);
+        this.requiredProductId = productId.toLowerCase();
+    }  
+
+    @Override 
+    public boolean handleEvent(DomainEvent event){
+        if (event instanceof AnimalProductCollected product) {
+            if (product.getProductId().equalsIgnoreCase(requiredProductId)) {
+                advanceProgress(product.getQuantity());
+                return true;
+            }
+        }
+        return false;
+    }
+}

@@ -31,8 +31,8 @@ import minifarm.core.events.ItemSold;
  * 1. @Override public boolean handleEvent(DomainEvent event)
  *    Logika Implementasi:
  *      if (event instanceof ItemSold sold) {
- *          advanceProgress((int) sold.getTotalPrice());
- *          return true;
+            advanceProgress((int) sold.getTotalPrice());
+            return true;
  *      }
  *      return false;
  * 
@@ -40,3 +40,19 @@ import minifarm.core.events.ItemSold;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SaleValueQuest extends AbstractQuest {
+
+    public SaleValueQuest(String questId, String title, int targetValue, long reward){
+        super(questId, title, targetValue, reward);
+    }
+
+    @Override 
+    public boolean handleEvent(DomainEvent event){
+        if (event instanceof ItemSold sold) {
+            advanceProgress((int) sold.getTotalPrice());
+            return true;
+        }
+        return false;
+    }
+}

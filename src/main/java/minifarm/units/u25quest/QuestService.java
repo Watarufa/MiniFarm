@@ -91,3 +91,64 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class QuestService {
+    private final Map<String, AbstractQuest> quests = new LinkedHashMap<>();
+    private final EventBus eventBus;
+
+    public QuestService(EventBus eventBus){
+        this.eventBus = eventBus;
+        // Quest bawaan MiniFarm
+        registerQuest(new HarvestQuest("quest_wheat", "Panen Pertama Gandum", "wheat", 2, 50L));
+        registerQuest(new AnimalProductQuest("quest_egg", "Koleksi Telur Segar", "egg", 2, 40L));
+        registerQuest(new SaleValueQuest("quest_sales", "Pebisnis Pemula", 50, 60L));
+
+        // Daftarkan listener ke event bus jika tersedia
+        if (eventBus != null) {
+            eventBus.subscribe(DomainEvent.class, this::onEvent);
+        }
+    }
+        
+    public QuestService(){
+        this(null);
+    }
+        
+
+    public void registerQuest(AbstractQuest quest){
+        if (quest != null) {
+            quests.put(quest.getQuestId(), quest);
+        }
+    }
+        
+    public void onEvent(DomainEvent event){
+        // TODO U25: Teruskan event ke setiap quest yang belum selesai
+        for (AbstractQuest q : quests.values()) {
+            if (!q.isCompleted()) {
+                boolean updated = q.handleEvent(event);
+                if (updated && q.isCompleted() && eventBus != null) {
+                    eventBus.publish(new QuestCompleted(event.getDay(), q.getQuestId(), q.getTitle()));
+                }
+            }
+        }
+    }
+
+    public List<AbstractQuest> getAllQuests(){
+        return Collections.unmodifiableList(new ArrayList<>(quests.values()));
+    }
+
+    public Optional<AbstractQuest> getQuest(String questId){
+        if (questId == null) return Optional.empty();
+        return Optional.ofNullable(quests.get(questId));
+    }  
+
+    public OperationResult<Void> claimReward(String questId, WalletPort walletPort){
+        // TODO U25: Klaim hadiah quest yang sudah selesai secara idempotent
+        Optional<AbstractQuest> opt = getQuest(questId);
+        if (opt.isEmpty()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Quest tidak ditemukan: " + questId);
+        }
+        return opt.get().claimReward(walletPort);
+    }
+
+        
+}
