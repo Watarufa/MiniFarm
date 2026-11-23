@@ -34,3 +34,17 @@ package minifarm.units.u21purchase;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SinglePurchasePolicy extends AbstractPurchasePolicy {
+    public SinglePurchasePolicy() {
+        super("SinglePurchasePolicy");
+    }
+    
+    @Override
+    public long calculateTotalCost(long unitPrice, int quantity) {
+        if (unitPrice < 0 || quantity <= 0) {
+            return 0;
+        }
+        return unitPrice * quantity;
+    }
+}
