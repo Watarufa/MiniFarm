@@ -183,3 +183,146 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class PlotService implements CropSlotPort, PlotCapacityPort, WaterablePlotPort {
+    private final List<AbstractFarmPlot> plots;
+    private final int maxPlots;
+
+    public PlotService(int initialPlots, int maxPlots) {
+        this.maxPlots = maxPlots;
+        this.plots = new ArrayList<>();
+        for (int i = 0; i < initialPlots; i++) {
+            plots.add(new OutdoorCropPlot(i));
+        }
+    }
+
+    public PlotService() {
+        this(GameConfig.INITIAL_PLOT_COUNT, GameConfig.MAX_PLOT_COUNT);
+    }
+
+    public int getPlotCount() {
+        return plots.size();
+    }
+
+    public int getOccupiedPlotCount() {
+        int count = 0;
+        for (AbstractFarmPlot plot : plots) {
+            if (plot.isOccupied()) count++;
+        }
+        return count;
+    }
+
+    public boolean isPlotEmpty(int plotIndex) {
+        if (!isValidIndex(plotIndex)) return false;
+        return !plots.get(plotIndex).isOccupied();
+    }
+
+    public Optional<CropSnapshot> getCropSnapshot(int plotIndex) {
+        if (!isValidIndex(plotIndex)) return Optional.empty();
+        return plots.get(plotIndex).getCropSnapshot();
+    }
+
+    public OperationResult<Void> placeCrop(int plotIndex, Object crop) {
+        if (!isValidIndex(plotIndex)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Indeks petak tidak valid: " + plotIndex);
+        }
+        AbstractFarmPlot plot = plots.get(plotIndex);
+        if (plot.isOccupied()) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Petak #" + plotIndex + " sudah terisi");
+        }
+        plot.placeCrop(crop);
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Object> takeCrop(int plotIndex) {
+        if (!isValidIndex(plotIndex)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Indeks petak tidak valid");
+        }
+        AbstractFarmPlot plot = plots.get(plotIndex);
+        if (!plot.isOccupied()) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Petak #" + plotIndex + " kosong");
+        }
+        Object removed = plot.removeCrop();
+        return OperationResult.ok(removed);
+    }
+
+    public OperationResult<Void> clearPlot(int plotIndex) {
+        if (!isValidIndex(plotIndex)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Indeks petak tidak valid");
+        }
+        plots.get(plotIndex).clear();
+        return OperationResult.ok();
+    }
+
+    public boolean isPlotMoist(int plotIndex) {
+        if (!isValidIndex(plotIndex)) return false;
+        return plots.get(plotIndex).isMoist();
+    }
+
+    public OperationResult<Void> waterPlot(int plotIndex) {
+        if (!isValidIndex(plotIndex)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Indeks petak tidak valid");
+        }
+        AbstractFarmPlot plot = plots.get(plotIndex);
+        if (plot.isMoist()) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, "Petak #" + plotIndex + " sudah lembap (tersiram air hujan atau sudah disiram hari ini)");
+        }
+        plot.setMoist(true);
+        return OperationResult.ok();
+    }
+
+    public void resetDailyMoisture() {
+        for (AbstractFarmPlot plot : plots) {
+            plot.setMoist(false);
+        }
+    }
+
+    public int getMaxPlots() {
+        return maxPlots;
+    }
+
+    public int getCurrentPlots() {
+        return plots.size();
+    }
+
+    public OperationResult<Void> expandPlots(int count) {
+        if (count <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Jumlah ekspansi harus lebih dari 0");
+        }
+        if (plots.size() + count > maxPlots) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Melebihi batas maksimum petak (" + maxPlots + ")");
+        }
+        for (int i = 0; i < count; i++) {
+            plots.add(new OutdoorCropPlot(plots.size()));
+        }
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> convertToProtectedPlot(int plotIndex) {
+        if (!isValidIndex(plotIndex)) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Indeks petak tidak valid");
+        }
+        AbstractFarmPlot current = plots.get(plotIndex);
+        if (current.isOccupied()) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Hanya petak kosong yang dapat di-upgrade ke Protected Plot");
+        }
+        ProtectedCropPlot protectedPlot = new ProtectedCropPlot(plotIndex);
+        plots.set(plotIndex, protectedPlot);
+        return OperationResult.ok();
+    }
+
+    public void applyDailyWeather(boolean isRaining) {
+        for (AbstractFarmPlot plot : plots) {
+            plot.applyWeather(isRaining);
+        }
+    }
+
+    public AbstractFarmPlot getPlot(int plotIndex) {
+        if (!isValidIndex(plotIndex)) return null;
+        return plots.get(plotIndex);
+    }
+
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < plots.size();
+    }
+}
