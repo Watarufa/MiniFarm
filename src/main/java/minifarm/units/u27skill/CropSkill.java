@@ -36,3 +36,16 @@ package minifarm.units.u27skill;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CropSkill extends AbstractFarmSkill {
+    public CropSkill(){
+        super("crop", "Farming & Crops");
+    }
+
+    @Override
+    public int getThresholdForNextLevel(int currentLevel){
+        if (currentLevel == 1) return 25;
+        if (currentLevel == 2) return 60;
+        return 100 + (currentLevel - 3) * 50;
+    }
+}

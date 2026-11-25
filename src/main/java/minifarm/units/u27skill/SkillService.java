@@ -86,3 +86,55 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SkillService implements ExperiencePort {
+    private final Map<String, AbstractFarmSkill> skills = new LinkedHashMap<>();
+    private final EventBus eventBus;
+
+    public SkillService(EventBus eventBus){
+        this.eventBus = eventBus;
+        skills.put("crop", new CropSkill());
+        skills.put("animal", new AnimalSkill());
+        skills.put("trade", new TradingSkill());
+
+        if (eventBus != null) {
+            eventBus.subscribe(DomainEvent.class, this::onEvent);
+        }
+    }
+
+    public SkillService() {
+        this(null);
+    }
+
+    public void onEvent(DomainEvent event){
+        if (event instanceof CropHarvested) {
+            addExperience("crop", 10);
+        } else if (event instanceof ItemSold) {
+            addExperience("trade", 5);
+        }
+    }
+
+    @Override 
+    public int getLevel(String skillCategory){
+        AbstractFarmSkill skill = skills.get(skillCategory.toLowerCase());
+        return skill != null ? skill.getLevel() : 1;
+    }
+
+    @Override 
+    public int getExperience(String skillCategory){
+        AbstractFarmSkill skill = skills.get(skillCategory.toLowerCase());
+        return skill != null ? skill.getCurrentXp() : 0;
+    }
+
+    @Override
+    public void addExperience(String skillCategory, int xpAmount){
+        AbstractFarmSkill skill = skills.get(skillCategory.toLowerCase());
+        if (skill != null) {
+            skill.addXp(xpAmount);
+        }
+    }
+
+    public List<AbstractFarmSkill> getAllSkills(){
+        return Collections.unmodifiableList(new ArrayList<>(skills.values()));
+    }
+}
