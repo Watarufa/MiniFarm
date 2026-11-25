@@ -83,3 +83,57 @@ import java.util.Map;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class ToolService implements ToolEffectPort {
+
+    private final Map<String, AbstractTool> tools = new HashMap<>();
+
+    public ToolService() {
+        registerTool(new Hoe());
+        registerTool(new WateringCan());
+        registerTool(new HarvestScythe());
+    }
+
+    public void registerTool(AbstractTool tool) {
+        if (tool != null) {
+            tools.put(tool.getToolId(), tool);
+        }
+    }
+
+    public AbstractTool getTool(String toolId) {
+        if (toolId == null) return null;
+        return tools.get(toolId.toLowerCase());
+    }
+
+    @Override
+    public boolean canUseTool(String toolId) {
+        AbstractTool tool = getTool(toolId);
+        return tool != null && tool.isUsable();
+    }
+
+    @Override
+    public int getDurability(String toolId) {
+        AbstractTool tool = getTool(toolId);
+        return tool != null ? tool.getDurability() : 0;
+    }
+
+    @Override
+    public int getToolLevel(String toolId) {
+        AbstractTool tool = getTool(toolId);
+        return tool != null ? tool.getLevel() : 1;
+    }
+
+    @Override
+    public OperationResult<Void> useTool(String toolId) {
+        AbstractTool tool = getTool(toolId);
+        if (tool == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Alat tidak ditemukan: " + toolId);
+        }
+        if (!tool.isUsable()) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Alat rusak / durability 0: " + tool.getToolName());
+        }
+        
+        tool.use();
+        return OperationResult.ok();
+    }
+}

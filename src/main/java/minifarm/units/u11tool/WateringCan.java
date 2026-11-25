@@ -35,3 +35,15 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class WateringCan extends AbstractTool {
+
+    public WateringCan() {
+        super(GameConfig.TOOL_WATERING_CAN, "Watering Can", GameConfig.INITIAL_TOOL_DURABILITY, 30, 1);
+    }
+
+    @Override
+    public double getEffectMultiplier() {
+        return 1.0;
+    }
+}
