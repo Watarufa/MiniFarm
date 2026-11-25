@@ -35,3 +35,13 @@ import java.util.List;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class AnimalProductDeliveryOrder extends AbstractDeliveryOrder {
+
+    public AnimalProductDeliveryOrder() {
+        super(
+        "order_animal_1", "Restoran Sarapan Pagi", 35L, List.of(new ItemStack(GameConfig.ITEM_EGG, 3))
+    );
+    }
+    
+}

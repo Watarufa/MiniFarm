@@ -35,3 +35,11 @@ import java.util.List;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class CropDeliveryOrder extends AbstractDeliveryOrder{
+    public CropDeliveryOrder() {
+        super(
+            "order_crop_1", "Kedai Roti Kota", 40L, List.of(new ItemStack(GameConfig.CROP_WHEAT, 3))
+        );
+    }
+}
