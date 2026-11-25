@@ -48,3 +48,23 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class HarvestQuest extends AbstractQuest {
+    private final String requiredCropType;
+
+    public HarvestQuest(String questId, String title, String cropType, int target, long reward){
+        super(questId, title, target, reward);
+        this.requiredCropType = cropType.toLowerCase();
+    }
+
+    @Override 
+    public boolean handleEvent(DomainEvent event){
+        if (event instanceof CropHarvested harvest) {
+            if (harvest.getCropType().equalsIgnoreCase(requiredCropType)) {
+                advanceProgress(harvest.getQuantity());
+                return true;
+            }
+        }
+        return false;
+    }
+}

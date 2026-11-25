@@ -103,3 +103,82 @@ import minifarm.core.events.DomainEvent;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractQuest {
+    // DEKLARASI ATRIBUT
+    private final String questId;
+    private final String title;
+    private final int target;
+    private int currentProgress;
+    private boolean completed;
+    private final long rewardCoins;
+    private boolean rewardClaimed;
+
+    // CONSTRUCTOR
+    protected AbstractQuest(String questId, String title, int target, long rewardCoins){
+        if (target <= 0) throw new IllegalArgumentException("Target quest harus > 0");
+        this.questId = questId;
+        this.title = title;
+        this.target = target;
+        this.currentProgress = 0;
+        this.completed = false;
+        this.rewardCoins = rewardCoins;
+        this.rewardClaimed = false;
+    }
+
+    // METHOD
+    public String getQuestId(){
+        return questId;
+    }
+   
+ 
+    public String getTitle(){
+        return title;
+    }
+   
+ 
+    public int getTarget(){
+        return target;
+    }
+   
+
+    public int getCurrentProgress(){
+        return currentProgress;
+    }
+   
+ 
+    public boolean isCompleted(){
+        return completed;
+    }
+   
+ 
+    public boolean isRewardClaimed(){
+        return rewardClaimed;
+    }
+   
+    public long getRewardCoins(){
+        return rewardCoins;
+    }
+
+    public void advanceProgress(int amount){
+        if (completed || amount <= 0) return;
+        this.currentProgress = Math.min(target, this.currentProgress + amount);
+        if (this.currentProgress >= target) {
+            this.completed = true;
+        }
+    }
+
+    public OperationResult<Void> claimReward(WalletPort walletPort){
+        if (!completed) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Quest belum selesai");
+        }
+        if (rewardClaimed) {
+            return OperationResult.failed(ResultCode.ALREADY_COMPLETED, "Hadiah quest sudah pernah diklaim");
+        }
+        rewardClaimed = true;
+        walletPort.credit(rewardCoins, "Reward Quest: " + title);
+        return OperationResult.ok();
+    }
+
+    public abstract boolean handleEvent(DomainEvent event);
+}
