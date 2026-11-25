@@ -113,3 +113,79 @@ import java.util.Map;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class SoilService implements SoilPort {
+
+    private final Map<Integer, AbstractSoilProfile> profiles = new HashMap<>();
+
+    public SoilService(int initialPlots) {
+        for (int i = 0; i < initialPlots; i++) {
+            profiles.put(i, new LoamySoilProfile(GameConfig.INITIAL_SOIL_FERTILITY));
+        }
+    }
+
+    public SoilService() {
+        this(GameConfig.INITIAL_PLOT_COUNT);
+    }
+
+    public void setPlotProfile(int plotIndex, AbstractSoilProfile profile) {
+        if (profile != null) {
+            profiles.put(plotIndex, profile);
+        }
+    }
+
+    @Override
+    public SoilSnapshot getSoilSnapshot(int plotIndex) {
+        AbstractSoilProfile profile = profiles.get(plotIndex);
+        if (profile == null) {
+            return new SoilSnapshot(0, false, "Unknown");
+        }
+        return profile.toSnapshot(false);
+    }
+
+    @Override
+    public OperationResult<Void> applyFertilizer(int plotIndex, int boostAmount) {
+        AbstractSoilProfile profile = profiles.get(plotIndex);
+        if (profile == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Profil tanah petak tidak ditemukan: " + plotIndex);
+        }
+        if (profile.getFertility() >= 100) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Kesuburan petak sudah maksimal (100)");
+        }
+        profile.boostFertility(boostAmount > 0 ? boostAmount : profile.getFertilizerEffect());
+        return OperationResult.ok();
+    }
+
+    public OperationResult<Void> applyFertilizerFromInventory(int plotIndex, InventoryPort inventoryPort) {
+        if (inventoryPort == null || !inventoryPort.hasItem(GameConfig.ITEM_FERTILIZER, 1)) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Tidak memiliki pupuk (fertilizer)");
+        }
+        AbstractSoilProfile profile = profiles.get(plotIndex);
+        if (profile == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Petak tidak ditemukan");
+        }
+        if (profile.getFertility() >= 100) {
+            return OperationResult.failed(ResultCode.INVALID_STATE, "Kesuburan tanah sudah maksimal");
+        }
+
+        OperationResult<Void> removeRes = inventoryPort.removeItem(GameConfig.ITEM_FERTILIZER, 1);
+        if (removeRes.isFailure()) {
+            return removeRes;
+        }
+
+        profile.boostFertility(profile.getFertilizerEffect());
+        return OperationResult.ok();
+    }
+
+    @Override
+    public void applyFertilityDecay(int plotIndex) {
+        AbstractSoilProfile profile = profiles.get(plotIndex);
+        if (profile != null) {
+            profile.decayFertility();
+        }
+    }
+
+    public boolean qualifiesForYieldBonus(int plotIndex) {
+        AbstractSoilProfile profile = profiles.get(plotIndex);
+        return profile != null && profile.getFertility() >= GameConfig.HIGH_FERTILITY_BONUS_THRESHOLD;
+    }
+}

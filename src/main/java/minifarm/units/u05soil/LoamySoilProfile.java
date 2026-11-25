@@ -37,3 +37,19 @@ package minifarm.units.u05soil;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class LoamySoilProfile extends AbstractSoilProfile {
+
+    public LoamySoilProfile(int initialFertility) {
+        super("Loamy Soil", initialFertility);
+    }
+
+    @Override
+    public int getDecayRate() {
+        return 5;
+    }
+
+    @Override
+    public int getFertilizerEffect() {
+        return 20;
+    }
+}
