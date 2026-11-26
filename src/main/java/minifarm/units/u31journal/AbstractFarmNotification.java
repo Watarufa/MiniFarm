@@ -51,3 +51,29 @@ package minifarm.units.u31journal;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmNotification {
+
+    private final String message;
+    private final int day;
+    private final long timestamp = System.currentTimeMillis();
+
+    protected AbstractFarmNotification(int day, String message) {
+        this.day = day;
+        this.message = message != null ? message : "";
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public abstract String format();
+}

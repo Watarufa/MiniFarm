@@ -33,3 +33,14 @@ package minifarm.units.u31journal;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class SuccessNotification extends AbstractFarmNotification {
+
+    public SuccessNotification(int day, String message) {
+        super(day, message);
+    }
+
+    @Override
+    public String format() {
+        return "[SUCCESS Day " + getDay() + "] " + getMessage();
+    }
+}
