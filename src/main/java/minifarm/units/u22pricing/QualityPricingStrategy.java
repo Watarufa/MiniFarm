@@ -35,3 +35,18 @@ package minifarm.units.u22pricing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class QualityPricingStrategy extends AbstractPricingStrategy {
+
+    public QualityPricingStrategy() {
+        super("QualityPricingStrategy");
+    }
+
+    @Override
+    public long calculatePrice(long basePrice, int quantity, int qualityLevel) {
+        if (basePrice < 0 || quantity <= 0) return 0;
+        double multiplier = 1.0 + Math.max(0, qualityLevel - 1) * 0.2;
+        return (long) Math.round(basePrice * quantity * multiplier);
+    }
+}

@@ -34,3 +34,17 @@ package minifarm.units.u22pricing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class FixedPricingStrategy extends AbstractPricingStrategy {
+
+    public FixedPricingStrategy() {
+        super("FixedPricingStrategy");
+    }
+
+    @Override
+    public long calculatePrice(long basePrice, int quantity, int qualityLevel) {
+        if (basePrice < 0 || quantity <= 0) return 0;
+        return basePrice * quantity;
+    }
+}

@@ -40,3 +40,19 @@ package minifarm.units.u22pricing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public abstract class AbstractPricingStrategy {
+
+    private final String strategyName;
+
+    protected AbstractPricingStrategy(String strategyName) {
+        this.strategyName = strategyName;
+    }
+
+    public String getStrategyName() {
+        return strategyName;
+    }
+
+    public abstract long calculatePrice(long basePrice, int quantity, int qualityLevel);
+}
