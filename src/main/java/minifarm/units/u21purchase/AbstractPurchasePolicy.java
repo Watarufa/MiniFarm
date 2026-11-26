@@ -40,3 +40,17 @@ package minifarm.units.u21purchase;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractPurchasePolicy {
+    private final String policyName;
+
+    protected AbstractPurchasePolicy(String policyName) {
+        this.policyName = policyName;
+    }
+
+    public String getPolicyName() {
+        return policyName;
+    }
+
+    public abstract long calculateTotalCost(long unitPrice, int quantity);
+}

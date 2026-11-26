@@ -101,3 +101,73 @@ import minifarm.core.api.ShopCatalogPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class PurchaseService {
+    private AbstractPurchasePolicy policy;
+    private final EventBus eventBus;
+
+    public PurchaseService(AbstractPurchasePolicy policy, EventBus eventBus) {
+        this.policy = policy != null ? policy : new SinglePurchasePolicy();
+        this.eventBus = eventBus;
+    }
+
+    public PurchaseService(EventBus eventBus) {
+        this(new SinglePurchasePolicy(), eventBus);
+    }
+
+    public void setPolicy(AbstractPurchasePolicy policy) {
+        if (policy != null) {
+            this.policy = policy;
+        }
+    }
+
+    public OperationResult<Void> purchase(
+            String itemId,
+            int quantity,
+            int day,
+            ShopCatalogPort shop,
+            WalletPort walletPort,
+            InventoryPort inventoryPort) {
+        
+        if (itemId == null || itemId.trim().isEmpty() || quantity <= 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, 
+            "Item atau kuantitas pembelian tidak valid");
+        }
+
+        OperationResult<Long> priceRes = shop.getItemPrice(itemId);
+        if (priceRes.isFailure()) {
+            return OperationResult.failed(priceRes.getCode(), priceRes.getMessage());
+        }
+
+        long unitPrice = priceRes.getOrNull();
+        long totalCost = policy.calculateTotalCost(unitPrice, quantity);
+
+        if (walletPort.getBalance() < totalCost) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_FUNDS, 
+            "Saldo tidak cukup (Butuh: " + totalCost + " G)");
+        }
+
+        if (inventoryPort.getAvailableSlots() <= 0 && !inventoryPort.hasItem(itemId, 1)) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, 
+            "Slot inventaris penuh");
+        }
+
+        OperationResult<Void> debitRes = walletPort.debit(totalCost, "Beli " + itemId + " x" + quantity);
+        if (debitRes.isFailure()) {
+            return debitRes;
+        }
+
+        OperationResult<Void> addRes = inventoryPort.addItem(itemId, quantity);
+        if (addRes.isFailure()) {
+            walletPort.credit(totalCost, "Refund gagal beli " + itemId);
+            return addRes;
+        }
+
+        if (eventBus != null) {
+            eventBus.publish(new ItemPurchased(day, itemId, quantity, totalCost));
+        }
+
+        return OperationResult.ok();
+
+    }
+}
