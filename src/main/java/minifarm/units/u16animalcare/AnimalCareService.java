@@ -61,3 +61,30 @@ import minifarm.core.events.EventBus;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class AnimalCareService{
+    private final EventBus eventBus;
+
+    public AnimalCareService(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
+
+    public AnimalCareService() {
+        this(null);
+    }
+
+    public OperationResult<Void> feedAnimal(String animalId, String feedItemId, int day, FarmAnimalPort animalPort, InventoryPort inventoryPort, EnergyPort energyPort) {
+       FeedAction action = new FeedAction(feedItemId);
+       OperationResult<Void> result = action.execute(animalId, animalPort, inventoryPort, energyPort);
+       if (result.isSuccess() && eventBus != null) {
+           eventBus.publish(new AnimalFed(day, animalId, feedItemId));
+       }
+       return result;
+}
+    public OperationResult<Void> performCare(AbstractAnimalCareAction action, String animalId, FarmAnimalPort animalPort, InventoryPort inventoryPort, EnergyPort energyPort) {
+       if (action == null) {
+           return OperationResult.ok();
+       }
+       return action.execute(animalId, animalPort, inventoryPort, energyPort);
+}
+}

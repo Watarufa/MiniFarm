@@ -51,3 +51,23 @@ import minifarm.core.api.OperationResult;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractAnimalCareAction {
+    private final String actionName;
+    private final int energyCost;
+
+    protected AbstractAnimalCareAction(String actionName, int energyCost) {
+        this.actionName = actionName;
+        this.energyCost = energyCost;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public int getEnergyCost() {
+        return energyCost;
+    }
+
+    public abstract OperationResult<Void> execute(String animalId, FarmAnimalPort animalPort, InventoryPort inventoryPort, EnergyPort energyPort);
+}

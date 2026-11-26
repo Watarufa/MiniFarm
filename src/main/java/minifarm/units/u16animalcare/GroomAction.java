@@ -45,3 +45,21 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class GroomAction extends AbstractAnimalCareAction{
+    public GroomAction(){
+        super("Groom Animal", GameConfig.ENERGY_COST_ANIMAL_CARE);
+    }
+
+    @Override public OperationResult<Void> execute( String animalId, FarmAnimalPort animalPort, InventoryPort inventoryPort, EnergyPort energyPort ){
+       if (energyPort.getCurrentEnergy() < getEnergyCost()) {
+           return OperationResult.failed(ResultCode.INSUFFICIENT_ENERGY, "Energi tidak cukup untuk grooming");
+       }
+       OperationResult<Void> careRes = animalPort.careAnimal(animalId, "groom");
+       if (careRes.isFailure()) {
+           return careRes;
+       }
+       
+       energyPort.consumeEnergy(getEnergyCost());
+       return OperationResult.ok();
+    }   
+}

@@ -65,3 +65,33 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class FeedAction extends AbstractAnimalCareAction{
+    private final String feedItemId;
+    
+    public FeedAction(String feedItemId){
+        super("Feed Animal", GameConfig.ENERGY_COST_ANIMAL_CARE);
+        this.feedItemId = feedItemId != null ? feedItemId : GameConfig.ITEM_ANIMAL_FEED;
+    }
+
+    public FeedAction(){
+        this(GameConfig.ITEM_ANIMAL_FEED);
+    }
+
+    @Override public OperationResult<Void> execute( String animalId, FarmAnimalPort animalPort, InventoryPort inventoryPort, EnergyPort energyPort) {
+    if (energyPort.getCurrentEnergy() < getEnergyCost()) {
+           return OperationResult.failed(ResultCode.INSUFFICIENT_ENERGY, "Energi tidak cukup untuk memberi pakan");
+       }
+       if (!inventoryPort.hasItem(feedItemId, 1)) {
+           return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Pakan '" + feedItemId + "' tidak ada di inventaris");
+       }
+       
+       OperationResult<Void> feedRes = animalPort.feedAnimal(animalId, feedItemId);
+       if (feedRes.isFailure()) {
+           return feedRes;
+       }
+       
+       inventoryPort.removeItem(feedItemId, 1);
+       energyPort.consumeEnergy(getEnergyCost());
+        return OperationResult.ok();
+    }
+}
