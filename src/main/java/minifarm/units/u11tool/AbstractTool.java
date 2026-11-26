@@ -88,3 +88,69 @@ import minifarm.core.api.MaintainableTool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractTool implements MaintainableTool {
+    private final String toolId;
+    private final String toolName;
+    private int durability;
+    private final int maxDurability;
+    private int level;
+
+    protected AbstractTool(String toolId, String toolName, int initialDurability, int maxDurability, int level) {
+        if (initialDurability < 0 || maxDurability <= 0) {
+            throw new IllegalArgumentException("Durability tidak valid");
+        }
+        this.toolId = toolId;
+        this.toolName = toolName;
+        this.durability = initialDurability;
+        this.maxDurability = maxDurability;
+        this.level = Math.max(1, level);
+    }
+
+    @Override
+    public String getToolId() {
+        return toolId;
+    }
+
+    @Override
+    public String getToolName() {
+        return toolName;
+    }
+
+    @Override
+    public int getDurability() {
+        return durability;
+    }
+
+    @Override
+    public int getMaxDurability() {
+        return maxDurability;
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
+    }
+
+    @Override
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean isUsable() {
+        return durability > 0;
+    }
+
+    public boolean use() {
+        if (!isUsable()) return false;
+        durability--;
+        return true;
+    }
+
+    @Override
+    public void repair() {
+        this.durability = maxDurability;
+    }
+
+    public abstract double getEffectMultiplier();
+}

@@ -33,3 +33,15 @@ package minifarm.units.u11tool;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class HarvestScythe extends AbstractTool {
+
+    public HarvestScythe() {
+        super("scythe", "Harvest Scythe", 40, 40, 1);
+    }
+
+    @Override
+    public double getEffectMultiplier() {
+        return 1.5;
+    }
+}
