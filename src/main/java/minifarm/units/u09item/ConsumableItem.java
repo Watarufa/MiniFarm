@@ -37,3 +37,19 @@ package minifarm.units.u09item;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class ConsumableItem extends AbstractFarmItem {
+   public ConsumableItem(String itemId, String displayName, long basePrice) {
+      super(itemId, displayName, "Consumable", basePrice);
+   }
+
+   @Override 
+   public boolean canSell() {
+      return false;
+   }
+
+   @Override 
+   public boolean canConsume() {
+      return true;
+   }
+}

@@ -4,6 +4,8 @@ import minifarm.core.api.OperationResult;
 import minifarm.core.api.ResultCode;
 import minifarm.core.api.ItemCatalogPort;
 import minifarm.core.config.GameConfig;
+
+import java.rmi.server.Operation;
 import java.util.*;
 
 /*
@@ -83,3 +85,53 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class ItemCatalog implements ItemCatalogPort {
+   private final Map<String, FarmItem> items = new LinkedHashMap<>();
+
+   public ItemCatalog() {
+      register(new ResourceItem(GameConfig.SEED_WHEAT, "Wheat Seed", GameConfig.WHEAT_SEED_PRICE));
+      register(new ResourceItem(GameConfig.SEED_CORN, "Corn Seed", GameConfig.CORN_SEED_PRICE));
+      register(new ResourceItem(GameConfig.SEED_TOMATO, "Tomato Seed", GameConfig.TOMATO_SEED_PRICE));
+
+      register(new ProduceItem(GameConfig.CROP_WHEAT, "Wheat", GameConfig.WHEAT_SELL_PRICE));
+      register(new ProduceItem(GameConfig.CROP_CORN, "Corn", GameConfig.CORN_SELL_PRICE));
+      register(new ProduceItem(GameConfig.CROP_TOMATO, "Tomato", GameConfig.TOMATO_SELL_PRICE));
+      register(new ProduceItem(GameConfig.ITEM_EGG, "Egg", GameConfig.EGG_SELL_PRICE));
+
+      register(new ConsumableItem(GameConfig.ITEM_ANIMAL_FEED, "Animal Feed", GameConfig.ANIMAL_FEED_PRICE));
+      register(new ConsumableItem(GameConfig.ITEM_FERTILIZER, "Fertilizer", GameConfig.FERTILIZER_PRICE));
+      register(new ConsumableItem(GameConfig.ITEM_PESTICIDE, "Pesticide", GameConfig.PESTICIDE_PRICE));
+      register(new ConsumableItem(GameConfig.ITEM_MEDICINE, "Medicine", GameConfig.MEDICINE_PRICE));
+
+      register(new ToolItem(GameConfig.TOOL_WATERING_CAN, "Watering Can", 50L));
+      register(new ToolItem(GameConfig.TOOL_HOE, "Hoe", 50L));
+   }
+
+   public void register(FarmItem item) {
+      if (item == null) {
+         throw new IllegalArgumentException("Item tidak boleh null");
+      }
+      items.put(item.getItemId(), item);
+   }
+
+   public Optional<FarmItem> getItem(String itemId) {
+      if (itemId == null) {
+         return Optional.empty();
+      }
+      return Optional.ofNullable(items.get(itemId.trim().toLowerCase()));
+   }
+
+   public OperationResult<FarmItem> findItem(String itemId) {
+      Optional<FarmItem> opt = getItem(itemId);
+
+      if (opt.isEmpty()) {
+         return OperationResult.failed(ResultCode.NOT_FOUND, "Item tidak ditemukan: " + itemId);
+      }
+      return OperationResult.ok(opt.get());
+   }
+
+   public List<FarmItem> getAllItems() {
+      return Collections.unmodifiableList(new ArrayList<>(items.values()));
+   }
+}

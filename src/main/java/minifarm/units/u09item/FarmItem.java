@@ -41,3 +41,12 @@ import minifarm.core.api.ItemDefinitionPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public interface FarmItem extends ItemDefinitionPort {
+   String getItemId();
+   String getDisplayName();
+   String getCategory();
+   long getBasePrice();
+   boolean canSell();
+   boolean canConsume();
+}
