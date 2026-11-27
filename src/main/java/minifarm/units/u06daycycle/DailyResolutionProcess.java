@@ -35,3 +35,14 @@ import minifarm.core.api.DayContext;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class DailyResolutionProcess extends AbstractDailyProcess {
+    public DailyResolutionProcess() {
+        super("DailyResolution", 50);
+    }
+
+    @Override
+    public void execute(DayContext context) {
+        // Resolusi pertumbuhan dan event harian dijalankan oleh participant terdaftar.
+    }
+}

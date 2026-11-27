@@ -2,6 +2,8 @@ package minifarm.units.u06daycycle;
 
 import minifarm.core.api.DayContext;
 
+import java.util.Objects;
+
 /*
  * ================================================================================================
  * PETUNJUK SPESIFIKASI KELAS (KOSONGAN - KETIK SENDIRI DARI NOL): PreDayValidationProcess
@@ -35,3 +37,14 @@ import minifarm.core.api.DayContext;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class PreDayValidationProcess extends AbstractDailyProcess {
+    public PreDayValidationProcess() {
+        super("PreDayValidation", 10);
+    }
+
+    @Override
+    public void execute(DayContext context) {
+        Objects.requireNonNull(context, "context tidak boleh null");
+    }
+}
