@@ -73,3 +73,43 @@ import minifarm.core.api.SoilSnapshot;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public abstract class AbstractSoilProfile {
+
+    private final String profileName;
+    private int fertility;
+
+    protected AbstractSoilProfile(String profileName, int initialFertility) {
+        this.profileName = profileName;
+        this.fertility = Math.max(0, Math.min(100, initialFertility));
+    }
+
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public int getFertility() {
+        return fertility;
+    }
+
+    public void setFertility(int fertility) {
+        this.fertility = Math.max(0, Math.min(100, fertility));
+    }
+
+    public void boostFertility(int amount) {
+        if (amount > 0) {
+            setFertility(this.fertility + amount);
+        }
+    }
+
+    public void decayFertility() {
+        setFertility(this.fertility - getDecayRate());
+    }
+
+    public SoilSnapshot toSnapshot(boolean isMoist) {
+        return new SoilSnapshot(fertility, isMoist, profileName);
+    }
+
+    public abstract int getDecayRate();
+
+    public abstract int getFertilizerEffect();
+}
