@@ -35,3 +35,16 @@ package minifarm.units.u27skill;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class TradingSkill extends  AbstractFarmSkill {
+    public TradingSkill(){
+        super("trade", "Commerce & Trading");
+    }
+
+    @Override
+    public int getThresholdForNextLevel(int currentLevel) {
+        if (currentLevel == 1) return 30;
+        if (currentLevel == 2) return 70;
+        return 120 + (currentLevel - 3) * 60;
+    }
+}

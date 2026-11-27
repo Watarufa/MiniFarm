@@ -35,3 +35,16 @@ package minifarm.units.u27skill;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class AnimalSkill extends AbstractFarmSkill {
+    public AnimalSkill() {
+        super("animal", "Animal Husbandry");
+    }
+
+    @Override 
+    public int getThresholdForNextLevel(int currentLevel){
+        if (currentLevel == 1) return 20;
+        if (currentLevel == 2) return 50;
+        return 90 + (currentLevel - 3) * 45;
+    }
+}

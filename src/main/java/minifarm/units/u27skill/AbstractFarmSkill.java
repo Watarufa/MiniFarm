@@ -74,3 +74,52 @@ package minifarm.units.u27skill;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmSkill{
+    private final String category;
+    private final String displayName;
+    private int level;
+    private int currentXp;
+
+    protected AbstractFarmSkill(String category, String displayName){
+        this.category = category.toLowerCase();
+        this.displayName = displayName;
+        this.level = 1;
+        this.currentXp = 0;
+    }
+
+    public String getCategory(){
+        return category;
+    }
+
+    public String getDisplayName(){
+        return displayName;
+    }
+
+    public int getLevel(){
+        return level;
+    }
+
+    public int getCurrentXp(){
+        return currentXp;
+    }
+
+    public boolean addXp(int amount){
+        if (amount <= 0) return false;
+            this.currentXp += amount;
+            boolean leveledUp = false;
+            while (currentXp >= getThresholdForNextLevel(level)) {
+           level++;
+           leveledUp = true;
+        }
+        return leveledUp;
+    }
+
+    public abstract int getThresholdForNextLevel(int currentLevel);
+
+    @Override 
+    public String toString(){
+        return displayName + " (Lv. " + level + ", " + currentXp + "/" + getThresholdForNextLevel(level) + " XP)";
+    }
+}
+
