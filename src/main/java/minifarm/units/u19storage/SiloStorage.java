@@ -35,3 +35,17 @@ package minifarm.units.u19storage;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class SiloStorage extends AbstractFarmStorage {
+
+    public SiloStorage() {
+        super("silo_storage", "Grain Silo", 10);
+    }
+
+    @Override
+    public boolean acceptsItem(String itemId) {
+        if (itemId == null) return false;
+        String id = itemId.toLowerCase();
+        return id.contains("seed") || id.contains("wheat") || id.contains("corn") || id.contains("feed");
+    }
+}

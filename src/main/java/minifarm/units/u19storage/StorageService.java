@@ -109,3 +109,76 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class StorageService implements StorageCapacityPort {
+    private final Map<String, AbstractFarmStorage> storages = new LinkedHashMap<>();
+
+    public StorageService() {
+        BarnStorage barn = new BarnStorage();
+        SiloStorage silo = new SiloStorage();
+        storages.put(barn.getStorageId(), barn);
+        storages.put(silo.getStorageId(), silo);
+    }
+
+    public AbstractFarmStorage getStorage(String storageId) {
+        if (storageId == null) return null;
+        return storages.get(storageId.toLowerCase());
+    }
+
+    
+    public OperationResult<Void> transferToStorage(String storageId, String itemId, int quantity, InventoryPort inventoryPort) {
+        AbstractFarmStorage storage = getStorage(storageId);
+        if (storage == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Storage tidak ditemukan: " + storageId);
+        }
+        if (!inventoryPort.hasItem(itemId, quantity)) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Item tidak mencukupi di inventaris");
+        }
+
+        OperationResult<Void> depositRes = storage.deposit(itemId, quantity);
+        if (depositRes.isFailure()) {
+            return depositRes; 
+        }
+
+        inventoryPort.removeItem(itemId, quantity);
+        return OperationResult.ok();
+    }
+
+    
+    public OperationResult<Void> transferToInventory(String storageId, String itemId, int quantity, InventoryPort inventoryPort) {
+        AbstractFarmStorage storage = getStorage(storageId);
+        if (storage == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Storage tidak ditemukan: " + storageId);
+        }
+        if (storage.getItemQuantity(itemId) < quantity) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ITEMS, "Item tidak cukup di storage");
+        }
+        if (inventoryPort.getAvailableSlots() <= 0 && !inventoryPort.hasItem(itemId, 1)) {
+            return OperationResult.failed(ResultCode.CAPACITY_EXCEEDED, "Slot inventaris penuh");
+        }
+
+        OperationResult<Void> withdrawRes = storage.withdraw(itemId, quantity);
+        if (withdrawRes.isFailure()) {
+            return withdrawRes;
+        }
+
+        inventoryPort.addItem(itemId, quantity);
+        return OperationResult.ok();
+    }
+
+    @Override
+    public int getStorageCapacity() {
+        AbstractFarmStorage barn = getStorage("barn_storage");
+        return barn != null ? barn.getCapacity() : 0;
+    }
+
+    @Override
+    public OperationResult<Void> expandStorageCapacity(int additionalSlots) {
+        AbstractFarmStorage barn = getStorage("barn_storage");
+        if (barn == null) {
+            return OperationResult.failed(ResultCode.NOT_FOUND, "Barn storage tidak ditemukan");
+        }
+        barn.expandCapacity(additionalSlots);
+        return OperationResult.ok();
+    }
+}
