@@ -40,3 +40,17 @@ package minifarm.units.u14energy;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractEnergyCostPolicy {
+    private final String policyName;
+
+    protected AbstractEnergyCostPolicy(String policyName) {
+        this.policyName = policyName;
+    }
+
+    public String getPolicyName() {
+        return policyName;
+    }
+
+    public abstract int calculateCost(int baseCost, String actionType);
+}

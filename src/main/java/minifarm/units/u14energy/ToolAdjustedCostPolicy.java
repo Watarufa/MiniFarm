@@ -40,3 +40,17 @@ package minifarm.units.u14energy;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class ToolAdjustedCostPolicy extends AbstractEnergyCostPolicy {
+    private final int toolLevel;
+
+    public ToolAdjustedCostPolicy(int toolLevel) {
+        super("ToolAdjustedCostPolicy");
+        this.toolLevel = toolLevel;
+    }
+
+    @Override
+    public int calculateCost(int baseCost, String actionType) {
+        int discount = toolLevel >= 2 ? 1 : 0;
+        return Math.max(1, baseCost - discount);
+    }
+}

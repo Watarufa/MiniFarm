@@ -33,3 +33,14 @@ package minifarm.units.u14energy;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class FixedCostPolicy extends AbstractEnergyCostPolicy {
+
+    public FixedCostPolicy() {
+        super("FixedCostPolicy");
+    }
+
+    @Override
+    public int calculateCost(int baseCost, String actionType) {
+        return Math.max(0, baseCost);
+    }
+}

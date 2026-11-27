@@ -87,3 +87,58 @@ import minifarm.core.config.GameConfig;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class EnergyService implements EnergyPort {
+    private int currentEnergy;
+    private final int maxEnergy;
+    private AbstractEnergyCostPolicy policy;
+
+    public EnergyService(int initialEnergy, int maxEnergy, AbstractEnergyCostPolicy policy) {
+        this.maxEnergy = maxEnergy > 0 ? maxEnergy : GameConfig.MAX_ENERGY;
+        this.currentEnergy = Math.max(0, Math.min(this.maxEnergy, initialEnergy));
+        this.policy = policy != null ? policy : new FixedCostPolicy();
+    }
+
+    public EnergyService() {
+        this(GameConfig.INITIAL_ENERGY, GameConfig.MAX_ENERGY, new FixedCostPolicy());
+    }
+
+    public void setPolicy(AbstractEnergyCostPolicy policy) {
+        if (policy != null) {
+            this.policy = policy;
+        }
+    }
+
+    @Override
+    public int getCurrentEnergy() {
+        return currentEnergy;
+    }
+
+    @Override
+    public int getMaxEnergy() {
+        return maxEnergy;
+    }
+
+    public int calculateActionCost(int baseCost, String actionType) {
+        return policy.calculateCost(baseCost, actionType);
+    }
+
+    @Override
+    public OperationResult<Void> consumeEnergy(int amount) {
+        if (amount < 0) {
+            return OperationResult.failed(ResultCode.INVALID_ARGUMENT, "Biaya energi tidak boleh negatif: " + amount);
+        }
+        if (currentEnergy < amount) {
+            return OperationResult.failed(ResultCode.INSUFFICIENT_ENERGY, "Energi tidak mencukupi (Tersisa: " + currentEnergy + ", Butuh: " + amount + ")");
+        }
+
+        this.currentEnergy -= amount;
+        return OperationResult.ok();
+    }
+
+    @Override
+    public void restoreEnergy(int amount) {
+        if (amount > 0) {
+            this.currentEnergy = Math.min(maxEnergy, currentEnergy + amount);
+        }
+    }
+}

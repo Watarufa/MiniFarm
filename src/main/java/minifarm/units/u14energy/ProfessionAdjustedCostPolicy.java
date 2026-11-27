@@ -39,3 +39,16 @@ package minifarm.units.u14energy;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class ProfessionAdjustedCostPolicy extends AbstractEnergyCostPolicy {
+    private final double modifier;
+
+    public ProfessionAdjustedCostPolicy(double modifier) {
+        super("ProfessionAdjustedCostPolicy");
+        this.modifier = modifier > 0 ? modifier : 1.0;
+    }
+
+    @Override
+    public int calculateCost(int baseCost, String actionType) {
+        return (int) Math.round(baseCost * modifier);
+    }
+}
