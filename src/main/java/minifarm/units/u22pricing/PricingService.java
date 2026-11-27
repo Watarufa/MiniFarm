@@ -50,3 +50,28 @@ import minifarm.core.api.PricingPort;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class PricingService implements PricingPort {
+
+    private AbstractPricingStrategy defaultStrategy;
+
+    public PricingService(AbstractPricingStrategy strategy) {
+        this.defaultStrategy = strategy != null ? strategy : new FixedPricingStrategy();
+    }
+
+    public PricingService() {
+        this(new FixedPricingStrategy());
+    }
+
+    public void setStrategy(AbstractPricingStrategy strategy) {
+        if (strategy != null) {
+            this.defaultStrategy = strategy;
+        }
+    }
+
+    @Override
+    public long calculatePrice(long basePrice, int quantity, int qualityLevel) {
+        return defaultStrategy.calculatePrice(basePrice, quantity, qualityLevel);
+    }
+}

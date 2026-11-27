@@ -38,3 +38,21 @@ package minifarm.units.u22pricing;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+
+public class BulkDiscountPricingStrategy extends AbstractPricingStrategy {
+
+    public BulkDiscountPricingStrategy() {
+        super("BulkDiscountPricingStrategy");
+    }
+
+    @Override
+    public long calculatePrice(long basePrice, int quantity, int qualityLevel) {
+        if (basePrice < 0 || quantity <= 0) return 0;
+        long subtotal = basePrice * quantity;
+        if (quantity >= 20) {
+            return (long) Math.round(subtotal * 0.85);
+        }
+        return subtotal;
+    }
+}
