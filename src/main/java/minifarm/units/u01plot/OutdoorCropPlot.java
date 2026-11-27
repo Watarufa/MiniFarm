@@ -45,3 +45,27 @@ package minifarm.units.u01plot;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public class OutdoorCropPlot extends AbstractFarmPlot {
+
+    public OutdoorCropPlot(int index) {
+        super(index);
+    }
+
+    @Override
+    public boolean receivesRain() {
+        return true;
+    }
+
+    @Override
+    public void applyWeather(boolean isRaining) {
+        if (isRaining) {
+            setMoist (true);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "OutdoorPlot #" + getIndex() + (isOccupied() ? " [Terisi]" : " [Kosong]") + (isMoist() ? " [Lembap]" : "");
+    }
+}
