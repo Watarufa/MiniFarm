@@ -1,9 +1,13 @@
 package minifarm.units.u31journal;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import minifarm.core.events.DayAdvanced;
 import minifarm.core.events.DomainEvent;
 import minifarm.core.events.EventBus;
-import java.util.*;
 
 /*
  * ================================================================================================
@@ -75,3 +79,65 @@ import java.util.*;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class JournalService {
+
+    public static final int MAX_ENTRIES = 50;
+
+    private final List<AbstractFarmNotification> entries = new LinkedList<>();
+    private final EventBus eventBus;
+
+    public JournalService(EventBus eventBus) {
+        this.eventBus = eventBus;
+
+        if (eventBus != null) {
+            eventBus.subscribe(DomainEvent.class, this::onEvent);
+        }
+    }
+
+    public JournalService() {
+        this(null);
+    }
+
+    public synchronized void record(AbstractFarmNotification notification) {
+        if (notification == null) return;
+
+        if (entries.size() >= MAX_ENTRIES) {
+            entries.remove(0);
+        }
+
+        entries.add(notification);
+    }
+
+    public void onEvent(DomainEvent event) {
+        if (event instanceof DayAdvanced dayAdv) {
+            record(new InfoNotification(
+                dayAdv.getDay(),
+                "Memasuki Hari " + dayAdv.getNewDay()
+                + " dengan cuaca " + dayAdv.getWeatherType()
+            ));
+        } else {
+            record(new InfoNotification(
+                event.getDay(),
+                "Peristiwa: " + event.getEventType()
+            ));
+        }
+    }
+
+    public synchronized List<AbstractFarmNotification> getRecentEntries(int limit) {
+        int count = Math.min(
+            entries.size(),
+            limit > 0 ? limit : entries.size()
+        );
+
+        List<AbstractFarmNotification> sub = entries.subList(
+            entries.size() - count,
+            entries.size()
+        );
+
+        return Collections.unmodifiableList(new ArrayList<>(sub));
+    }
+
+    public synchronized List<AbstractFarmNotification> getAllEntries() {
+        return Collections.unmodifiableList(new ArrayList<>(entries));
+    }
+}

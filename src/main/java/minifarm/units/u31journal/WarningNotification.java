@@ -33,3 +33,14 @@ package minifarm.units.u31journal;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+public class WarningNotification extends AbstractFarmNotification {
+
+    public WarningNotification(int day, String message) {
+        super(day, message);
+    }
+
+    @Override
+    public String format() {
+        return "[WARN Day " + getDay() + "] " + getMessage();
+    }
+}
