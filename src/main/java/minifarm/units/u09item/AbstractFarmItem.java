@@ -75,3 +75,55 @@ import java.util.Objects;
  * SILAKAN KETIK IMPLEMENTASI KELAS ANDA DI BAWAH INI SECARA MANDIRI DARI NOL:
  * ================================================================================================
  */
+
+public abstract class AbstractFarmItem implements FarmItem {
+   private final String itemId;
+   private final String displayName;
+   private final String category;
+   private final long basePrice;
+
+   protected AbstractFarmItem(String itemId, String displayName, String category, long basePrice) {
+      if (itemId == null || itemId.trim().isEmpty()) {
+         throw new IllegalArgumentException("itemId tidak boleh kosong");
+      }
+      if (displayName == null || displayName.trim().isEmpty()) {
+         throw new IllegalArgumentException("displayName tidak boleh kosong");
+      }
+      if (category == null || category.trim().isEmpty()) {
+         throw new IllegalArgumentException("category tidak boleh kosong");
+      }
+      if (basePrice < 0) {
+         throw new IllegalArgumentException("basePrice tidak boleh negatif: " + basePrice);
+      }
+       
+      this.itemId = itemId.trim().toLowerCase();
+      this.displayName = displayName.trim();
+      this.category = category.trim();
+      this.basePrice = basePrice;
+   }
+
+   @Override
+   public String getItemId() {
+      return itemId;
+   }
+
+   @Override
+   public String getDisplayName() {
+      return displayName;
+   }
+
+   @Override
+   public String getCategory() {
+      return category;
+   }
+
+   @Override
+   public long getBasePrice() {
+      return basePrice;
+   }
+
+   @Override
+   public String toString() {
+      return displayName + " [" + category + "] (" + itemId + ", " + basePrice + " G)";
+   }
+}
